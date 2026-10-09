@@ -37,6 +37,7 @@ export class GridComponent<T> {
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['config']) {
+            this.actions = [];
             this.displayedColumns = this.config.columns.map((c) => c.name);
             if (this.config.actions && this.config.actions.length > 0) {
                 this.actions = this.config.actions;

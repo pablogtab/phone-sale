@@ -201,7 +201,7 @@
         @apply animate-appear;
 
         &::-webkit-scrollbar {
-            width: 20px;
+            width: 6px;
         }
 
         &::-webkit-scrollbar-track {
@@ -209,11 +209,8 @@
         }
 
         &::-webkit-scrollbar-thumb {
-            box-shadow: inset 0 0 10px 10px #444;
-            border: solid 7px transparent;
-            border-top: 20px solid transparent;
-            border-bottom: 20px solid transparent;
-            border-radius: 10px;
+            background: #b7c2b5;
+            border-radius: 999px;
         }
     }
 
@@ -499,3 +496,30 @@ search-object, provider-search, client-search, device-model-search, product-sear
 .inline-error { color: #a43838; background: #fff0ef; border: 1px solid #f0d5d2; padding: 12px 15px; border-radius: 9px; font-size: 13px; }
 .inline-success { color: #315e3c; background: #ecf5e9; border: 1px solid #d6e6d0; padding: 12px 15px; border-radius: 9px; font-size: 13px; }
 button.raised.primary icon { color: white; } button.raised.primary icon i { color: white !important; }
+
+/* Search dropdowns share the dialog container, outside its scrolling panel. */
+.cdk-overlay-container > .p-overlay {
+    pointer-events: auto;
+}
+
+/* Compact scrollbars for dialogs and searchable lists. */
+.dialog-panel,
+.p-autocomplete-list-container {
+    scrollbar-width: thin;
+    scrollbar-color: #b7c2b5 transparent;
+}
+.p-autocomplete-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+.p-autocomplete-list-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.p-autocomplete-list-container::-webkit-scrollbar-thumb {
+    background: #b7c2b5;
+    border-radius: 999px;
+}
+
+/* Order entry needs the full workspace width for product names and prices. */
+.workspace > router-outlet + app-edit-order {
+    max-width: none;
+}

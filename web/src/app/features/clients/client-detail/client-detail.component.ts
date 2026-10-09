@@ -4,12 +4,11 @@ import {
     inject as injectView,
 } from '@angular/core';
 import { refreshView } from '@/app/core/utils/refresh-view';
-import { EditSaveCancelComponent } from '@/app/shared/ui/edit-save-cancel/edit-save-cancel.component';
 import { SharedModule } from '@/app/shared/ui/shared.module';
 import { Client } from '@/app/core/models/client';
 import { ClientService, UpdateClientDto } from '@/app/core/api/client.service';
 import { MessagesService } from '@/app/core/api/messages.service';
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -45,14 +44,38 @@ export class ClientDetailComponent {
         private clientService: ClientService,
     ) {}
 
+    readonly loading = signal(true);
+    readonly failed = signal(false);
+    readonly saving = signal(false);
+    back() {
+        this.router.navigate(['/clients']);
+    }
+    get birthDateLabel() {
+        const value = this.client?.birthDate;
+        if (!value) return 'Sin registrar';
+        const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+        return match ? `${match[3]}/${match[2]}/${match[1]}` : value;
+    }
     ngOnInit() {
         this.clientForm.disable();
+        this.loadClient();
+    }
+    loadClient() {
+        this.loading.set(true);
+        this.failed.set(false);
         this.clientService
             .get(this.clientId)
             .pipe(refreshView(this.viewChangeDetector, this.viewLifetime))
-            .subscribe((client) => {
-                this.client = client;
-                this.loadForm(client);
+            .subscribe({
+                next: (client) => {
+                    this.client = client;
+                    this.loadForm(client);
+                    this.loading.set(false);
+                },
+                error: () => {
+                    this.failed.set(true);
+                    this.loading.set(false);
+                },
             });
     }
 
@@ -62,7 +85,12 @@ export class ClientDetailComponent {
         this.clientForm.get('instagram')?.setValue(client.instagram);
         this.clientForm.get('identifier')?.setValue(client.identifier);
         this.clientForm.get('address')?.setValue(client.address);
-        this.clientForm.get('birthDate')?.setValue(client.birthDate);
+        const date = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(client.birthDate || '');
+        this.clientForm
+            .get('birthDate')
+            ?.setValue(
+                date ? `${date[3]}-${date[2]}-${date[1]}` : client.birthDate,
+            );
         this.clientForm.get('wholesaler')?.setValue(client.wholesaler);
     }
 
@@ -76,6 +104,7 @@ export class ClientDetailComponent {
     }
 
     save() {
+        if (this.saving() || this.clientForm.disabled) return;
         if (
             this.clientForm.invalid ||
             !this.clientForm.controls.name.value?.trim()
@@ -90,11 +119,12 @@ export class ClientDetailComponent {
                 : null,
             identifier: this.clientForm.get('identifier')?.value,
             instagram: this.clientForm.get('instagram')?.value,
-            name: this.clientForm.get('name')?.value,
+            name: this.clientForm.get('name')?.value.trim(),
             phoneNumber: this.clientForm.get('whatsapp')?.value,
             wholesaler: this.clientForm.get('wholesaler')?.value,
         };
 
+        this.saving.set(true);
         this.clientService
             .update(this.clientId, dto)
             .pipe(refreshView(this.viewChangeDetector, this.viewLifetime))
@@ -102,9 +132,13 @@ export class ClientDetailComponent {
                 next: (data) => {
                     this.message.success('Cliente actualizado correctamente');
                     this.client = data;
+                    this.saving.set(false);
                     this.clientForm.disable();
                 },
-                error: (err) => this.message.showPublicError(err),
+                error: (err) => {
+                    this.saving.set(false);
+                    this.message.showPublicError(err);
+                },
             });
     }
 

@@ -10,8 +10,8 @@ export async function seedStarter(
   db: Repositories,
   options: { username: string; password: string; storeName?: string },
 ) {
-  if (options.password.length < 12)
-    throw new Error('Set SEED_ADMIN_PASSWORD to at least 12 characters');
+  if (options.password.length < 3)
+    throw new Error('Set SEED_ADMIN_PASSWORD to at least 3 characters');
   await db.parameter.query('SELECT pg_advisory_xact_lock(73420911)');
   const key = 'seed_starter_v1';
   const marker = await db.parameter.findOneBy({ key });

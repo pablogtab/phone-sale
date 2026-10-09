@@ -84,28 +84,30 @@
                         headerColumn.get(row) | gridPipe: headerColumn.pipe
                     }}</span>
                 </div>
-                <button
-                    [cdkMenuTriggerFor]="menu"
-                    class="flex items-center relative"
-                >
-                    <icon name="more-vertical"></icon>
-                </button>
-                <ng-template #menu>
-                    <div class="menu" cdkMenu>
-                        @for (action of actions; track $index) {
-                            <button
-                                class="menu-item"
-                                [disabled]="action.disabled(row)"
-                                cdkMenuItem
-                                (click)="
-                                    executeAction(action.eventName, row, i)
-                                "
-                            >
-                                <span>{{ action.label }}</span>
-                            </button>
-                        }
-                    </div>
-                </ng-template>
+                @if (actions.length) {
+                    <button
+                        [cdkMenuTriggerFor]="menu"
+                        class="flex items-center relative"
+                    >
+                        <icon name="more-vertical"></icon>
+                    </button>
+                    <ng-template #menu>
+                        <div class="menu" cdkMenu>
+                            @for (action of actions; track $index) {
+                                <button
+                                    class="menu-item"
+                                    [disabled]="action.disabled(row)"
+                                    cdkMenuItem
+                                    (click)="
+                                        executeAction(action.eventName, row, i)
+                                    "
+                                >
+                                    <span>{{ action.label }}</span>
+                                </button>
+                            }
+                        </div>
+                    </ng-template>
+                }
             </div>
 
             @for (column of nonHeaderColumns; track $index) {

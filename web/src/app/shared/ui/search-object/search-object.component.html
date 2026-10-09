@@ -1,19 +1,24 @@
 <p-autocomplete
-  class="entity-select"
-  [formControl]="hcd.control"
-  [suggestions]="options"
-  (completeMethod)="searchOptions($event)"
-  [optionLabel]="displayLabel"
-  [placeholder]="placeholder"
-  [forceSelection]="true"
-  [completeOnFocus]="true"
-  [showClear]="true"
-  [dropdown]="true"
-  [delay]="0"
-  [attr.aria-busy]="loading()"
-  [ariaLabel]="placeholder"
-  dropdownAriaLabel="Mostrar opciones"
-  appendTo="body"
-  [emptyMessage]="failed() ? 'No pudimos cargar las opciones. Volvé a buscar.' : 'No hay resultados'"
-  fluid
+    class="entity-select"
+    [formControl]="hcd.control"
+    [suggestions]="options()"
+    [overlayOptions]="overlayOptions"
+    (completeMethod)="searchOptions($event)"
+    [optionLabel]="displayLabel"
+    [placeholder]="placeholder"
+    [forceSelection]="true"
+    [completeOnFocus]="true"
+    [showClear]="true"
+    [dropdown]="true"
+    [delay]="0"
+    [attr.aria-busy]="loading()"
+    [ariaLabel]="placeholder"
+    dropdownAriaLabel="Mostrar opciones"
+    [appendTo]="appendTo"
+    [emptyMessage]="
+        failed()
+            ? 'No pudimos cargar las opciones. Volvé a buscar.'
+            : 'No hay resultados'
+    "
+    fluid
 />

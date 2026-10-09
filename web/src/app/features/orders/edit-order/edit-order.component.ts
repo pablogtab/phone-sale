@@ -15,7 +15,11 @@ import { SharedModule } from '@/app/shared/ui/shared.module';
 import { User } from '@/app/core/models/user';
 import { Client } from '@/app/core/models/client';
 import { CURRENCIES } from '@/app/core/models/currency';
-import { Order, ORDER_PAYMENT_METHODS } from '@/app/core/models/order';
+import {
+    Order,
+    ORDER_PAYMENT_METHODS,
+    ORDER_STATUSES,
+} from '@/app/core/models/order';
 import { Product } from '@/app/core/models/product';
 import { DeviceAndFile, DeviceService } from '@/app/core/api/device.service';
 import { MessagesService } from '@/app/core/api/messages.service';
@@ -253,15 +257,39 @@ export class EditOrderComponent {
         }
     }
 
+    get isReadOnly() {
+        return (
+            this.order?.status === 'confirmed' ||
+            this.order?.status === 'cancelled'
+        );
+    }
+    get orderStatus() {
+        return this.order ? ORDER_STATUSES[this.order.status] : '';
+    }
+    readonly readOnlyProductsGridConfig: GridConfig<IOrderItem> = {
+        ...this.orderItemGridConfig,
+        actions: [],
+    };
+    readonly readOnlyPaymentsGridConfig: GridConfig<IPayment> = {
+        ...this.paymentsGridConfig,
+        actions: [],
+    };
+
     loadOrder(order: OrderAndDetails) {
         if (!order) return;
         this.order = order;
         this.isEditing = true;
-        this.title = 'Editar orden';
-        this.clientSearcher.searcher.findById(order.client.publicId);
+        this.title = this.isReadOnly
+            ? `Orden ${this.orderStatus.toLowerCase()}`
+            : 'Editar orden';
+        this.form.controls.client.setValue(order.client);
+        if (!this.isReadOnly)
+            this.clientSearcher.searcher.findById(order.client.publicId);
         this.form.controls.client.disable();
         this.form.controls.exchangeRate.setValue(order.exchangeRate);
-        this.form.controls.type.setValue(order.type);
+        this.form.controls.type.setValue(order.type, {
+            emitEvent: !this.isReadOnly,
+        });
         this.form.controls.type.disable();
         this.products.array = order.items.map((i) => ({
             ...i.product,
@@ -282,14 +310,19 @@ export class EditOrderComponent {
             };
         });
         if (this.order.deliveredByUserId) {
-            this.userSearcher.searcher.findById(this.order.deliveredByUserId);
+            this.userService
+                .get(this.order.deliveredByUserId)
+                .pipe(refreshView(this.viewChangeDetector, this.viewLifetime))
+                .subscribe((user) =>
+                    this.form.controls.deliveredByUser.setValue(user),
+                );
         }
 
         if (
             this.order.status === 'cancelled' ||
             this.order.status === 'confirmed'
         ) {
-            this.form.disable();
+            this.form.disable({ emitEvent: false });
         }
     }
 
@@ -306,6 +339,7 @@ export class EditOrderComponent {
     }
 
     addProduct() {
+        if (this.isReadOnly || this.form.disabled) return;
         const valid = this.validateProduct();
         if (!valid) return;
 
@@ -372,6 +406,7 @@ export class EditOrderComponent {
     }
 
     newPayment() {
+        if (this.isReadOnly || this.form.disabled) return;
         this.dialog
             .open<OrderPaymentDto, NewOrderPaymentParams>(
                 NewOrderPaymentComponent,
@@ -394,6 +429,7 @@ export class EditOrderComponent {
     }
 
     newCashback() {
+        if (this.isReadOnly || this.form.disabled) return;
         this.dialog
             .open<OrderPaymentDto, NewOrderPaymentParams>(
                 NewOrderPaymentComponent,
@@ -456,6 +492,7 @@ export class EditOrderComponent {
     }
 
     removeProduct(index: number) {
+        if (this.isReadOnly || this.form.disabled) return;
         this.products.remove(index, 1);
     }
 
@@ -472,6 +509,7 @@ export class EditOrderComponent {
     }
 
     paymentGridAction(event: { event: string; row: IPayment; index: number }) {
+        if (this.isReadOnly || this.form.disabled) return;
         switch (event.event) {
             case 'delete':
                 this.payments.remove(event.index, 1);
@@ -480,6 +518,7 @@ export class EditOrderComponent {
     }
 
     async saveCredit() {
+        if (this.isReadOnly || this.form.disabled) return;
         const msg = this.payments.length
             ? `El pago a cuenta corriente no incluirá los pagos cargados, ¿desea continuar?`
             : `¿Desea guardar la orden como pago a cuenta corriente?`;
@@ -580,6 +619,7 @@ export class EditOrderComponent {
     }
 
     rounding() {
+        if (this.isReadOnly || this.form.disabled) return;
         this.payments.push({
             amountARS: rounding(
                 this.balanceUSD * this.form.controls.exchangeRate.value,

@@ -9,7 +9,7 @@ import { MessagesService } from '@/app/core/api/messages.service';
 import { collapsableOpen } from '@/app/core/utils/animations/collapsable-open.animation';
 import { environment } from '@/environments';
 import { Dialog, DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 
 import { SharedModule } from '../../../shared/ui/shared.module';
 import {
@@ -20,11 +20,11 @@ import {
     EditDeviceComponent,
     EditDeviceDialogParams,
 } from '../edit-device/edit-device.component';
-import { Device, DEVICE_STATUSES } from '@/app/core/models/device';
-import { TimelineModule } from '@openng/optimus-ui/timeline';
+import { Device, DEVICE_STATUSES_TRANSLATION } from '@/app/core/models/device';
+import { catalogLabel } from '@/app/core/utils/catalog-label';
 
 @Component({
-    imports: [SharedModule, TimelineModule],
+    imports: [SharedModule],
     animations: [collapsableOpen],
     templateUrl: './device-info.component.html',
     styleUrl: './device-info.component.css',
@@ -41,19 +41,32 @@ export class DeviceInfoComponent {
 
     device: DetailedDevice = {} as DetailedDevice;
 
-    constructor() {}
+    readonly catalogLabel = catalogLabel;
+    readonly loading = signal(true);
+    readonly failed = signal(false);
+    close() {
+        this.dialogRef.close();
+    }
 
     ngOnInit(): void {
         this.loadInfo();
     }
 
     loadInfo() {
+        this.loading.set(true);
+        this.failed.set(false);
         this.deviceService
             .get(this.data.deviceId)
             .pipe(refreshView(this.viewChangeDetector, this.viewLifetime))
-            .subscribe((device) => {
-                this.device = device;
-                // this.editDevice()
+            .subscribe({
+                next: (device) => {
+                    this.device = device;
+                    this.loading.set(false);
+                },
+                error: () => {
+                    this.failed.set(true);
+                    this.loading.set(false);
+                },
             });
     }
 
@@ -107,15 +120,11 @@ export class DeviceInfoComponent {
     }
 
     getDeviceStatus(device: Device): string {
-        return DEVICE_STATUSES[device.status] ?? 'Desconocido';
+        return DEVICE_STATUSES_TRANSLATION[device.status] ?? 'Desconocido';
     }
 
     get hasBeenTested() {
         return Boolean(this.device?.testedAt);
-    }
-
-    get status() {
-        return 'DISPONIBLE';
     }
 
     get isSealed() {

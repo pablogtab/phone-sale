@@ -45,10 +45,35 @@ describe('client detail editing', () => {
     });
     it('loads fetched values into a disabled form without another click', async () => {
         await fixture.whenStable();
-        expect(fixture.nativeElement.querySelector('input').value).toBe(
-            'Ana Demo',
-        );
+        expect(fixture.nativeElement.textContent).toContain('Ana Demo');
+        expect(fixture.nativeElement.querySelector('input')).toBeNull();
         expect(fixture.componentInstance.clientForm.disabled).toBe(true);
+    });
+    it('switches from a read-only profile to editing and restores the profile on cancel', async () => {
+        await fixture.whenStable();
+        expect(fixture.nativeElement.textContent).toContain('Solo lectura');
+        [...fixture.nativeElement.querySelectorAll('button')]
+            .find((button: HTMLElement) =>
+                button.textContent.includes('Editar cliente'),
+            )
+            .click();
+        await fixture.whenStable();
+        const name = fixture.nativeElement.querySelector('#name');
+        expect(name.value).toBe('Ana Demo');
+        expect(fixture.nativeElement.querySelector('#birthDate').value).toBe(
+            '1990-01-01',
+        );
+        name.value = 'Changed';
+        name.dispatchEvent(new Event('input'));
+        [...fixture.nativeElement.querySelectorAll('button')]
+            .find((button: HTMLElement) =>
+                button.textContent.includes('Cancelar'),
+            )
+            .click();
+        await fixture.whenStable();
+        expect(fixture.nativeElement.querySelector('input')).toBeNull();
+        expect(fixture.nativeElement.textContent).toContain('Ana Demo');
+        expect(fixture.nativeElement.textContent).not.toContain('Changed');
     });
     it('cancel restores the stored customer and disables editing', () => {
         const c = fixture.componentInstance;

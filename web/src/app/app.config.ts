@@ -17,11 +17,19 @@ import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { provideOptimus } from '@openng/optimus-ui/config';
 import { MyPreset } from '@/theme';
+import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
+
+// Optimus appends dropdowns to body; keep CDK dialogs in the same stacking context.
+export const overlayCompatibilityProvider = {
+    provide: OVERLAY_DEFAULT_CONFIG,
+    useValue: { usePopover: false },
+};
 
 registerLocaleData(localeEs, 'es');
 
 export const appConfig: ApplicationConfig = {
     providers: [
+        overlayCompatibilityProvider,
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(
             routes,

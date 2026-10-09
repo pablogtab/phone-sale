@@ -168,11 +168,45 @@ describe('sales workflows', () => {
     it('confirmed orders are read-only and cannot be posted again', async () => {
         const t = await newSale();
         t.component.loadOrder(order as unknown as OrderAndDetails);
-        t.http.expectOne('/api/clients/customer-1').flush(customer);
         expect(t.component.form.disabled).toBe(true);
         await t.component.saveOrder();
         t.http.expectNone('/api/orders/continue/order-1');
     });
+    it.each(['confirmed', 'cancelled'] as const)(
+        'renders %s orders as a summary with no mutation controls',
+        async (status) => {
+            const t = await newSale();
+            t.component.loadOrder({
+                ...order,
+                status,
+            } as unknown as OrderAndDetails);
+            t.fixture.changeDetectorRef.markForCheck();
+            await t.fixture.whenStable();
+            const text = t.fixture.nativeElement.textContent;
+            expect(text).toContain('Solo lectura');
+            expect(text).not.toContain('Nuevo Pago');
+            expect(text).not.toContain('Eliminar');
+            expect(text).not.toContain('Guardar');
+            expect(t.fixture.nativeElement.querySelector('input')).toBeNull();
+            expect(
+                Object.values(t.component.form.controls).every(
+                    (control) => control.disabled,
+                ),
+            ).toBe(true);
+            const count = t.component.products.length;
+            const payments = t.component.payments.length;
+            t.component.removeProduct(0);
+            t.component.paymentGridAction({
+                event: 'delete',
+                row: t.component.payments.array[0],
+                index: 0,
+            });
+            t.component.rounding();
+            t.component.newPayment();
+            expect(t.component.products.length).toBe(count);
+            expect(t.component.payments.length).toBe(payments);
+        },
+    );
     it('continues a pending order without resending persisted items or payments', async () => {
         const t = await newSale();
         t.component.loadOrder({

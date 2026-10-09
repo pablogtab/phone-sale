@@ -16,11 +16,11 @@ The frontend suite uses Angular TestBed, RouterTestingHarness, jsdom and HttpTes
 | Dialogs | 20 model, color, storage, accessory, user, device, service, payment and accounting dialogs; opening performs no mutation |
 | Authentication | Login submission, invalid input, duplicate submission, errors, password visibility, existing session, guards and token scope |
 | Catalog | Loading, empty/error/retry states, stale responses, drag ordering and rollback, new/edit models, required selections, accessories, prices, adjustments, color/storage activation, readable labels without parentheses |
-| Sales | Pricing, quantities, duplicate items, totals, manual exchange rate, full payment, credit, pending-order continuation, read-only confirmed orders, cancellation, retries, rounding and wholesale confirmation |
-| Inventory | Model relations, validation, multipart create/update, photos, missing IMEI, details, tester identity, service and completion, stale search and retry |
+| Sales | Pricing, quantities, duplicate items, totals, manual exchange rate, full payment, credit, pending-order continuation, read-only confirmed/cancelled orders and blocked product/payment actions, cancellation, retries, rounding and wholesale confirmation |
+| Inventory | Model relations, validation, multipart create/update, photos, missing IMEI, details with Spanish statuses, history/loading/retry states, tester identity, service and completion, stale search and retry |
 | Payments/accounts | USD/ARS conversion, cashback, valid amounts, cash/bank destinations, USD confirmation, signed movements, transfers and account history |
-| Customers/users | Listing and creation, form load/edit/cancel/save, invalid names, errors, role selection and permission payloads |
-| Settings/controls | Store name and manual dollar persistence, selector cancellation, checkbox/select integration, monetary formatting, pagination, label editing, permission visibility and observable teardown |
+| Customers/users | Listing and creation, read-only profiles, visible edit/cancel controls, birth dates, form load/edit/cancel/save, invalid names, errors, role selection and permission payloads |
+| Settings/controls | Store name and manual dollar persistence, async model search/selection and error recovery inside a real CDK dialog, overlay compatibility, selector cancellation, checkbox/select integration, monetary formatting, pagination, label editing, permission visibility and observable teardown |
 
 Coverage includes all `src/app/**/*.ts`, including unvisited files. Thresholds are global: 80% statements and lines, 75% branches and functions. Reports are generated at `web/coverage/phone-sale/index.html` and uploaded by the Verify workflow. Generated reports are ignored by Git.
 

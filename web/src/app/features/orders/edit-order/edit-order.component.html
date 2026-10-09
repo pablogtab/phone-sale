@@ -1,83 +1,134 @@
-<form [formGroup]="form" class="p-4 flex flex-col gap-4 pb-40">
+<form [formGroup]="form" class="order-page">
     <go-back
         [title]="title"
         previousRoute="orders"
         previousRouteName="Órdenes"
     ></go-back>
-    <chips formControlName="type">
-        <chip value="faceid">Tienda</chip>
-        <chip value="sale">Sale</chip>
-        <chip value="wholesale">Mayorista</chip>
-    </chips>
-    <div class="flex flex-row flex-wrap gap-4 items-center">
-        <div class="min-w-52 flex-[2]">
-            <span>Cliente</span>
-            <client-search formControlName="client"></client-search>
+    @if (isReadOnly) {
+        <div class="readonly-notice" role="status">
+            <icon name="lock" size="20" />
+            <div>
+                <strong>{{ orderStatus }} · Solo lectura</strong>
+                <p>
+                    Esta orden está cerrada. Los productos, pagos y datos de la
+                    operación no se pueden modificar.
+                </p>
+            </div>
         </div>
-        <div class="min-w-52 flex-[2]">
-            <span>Usuario que entrega</span>
-            <user-search formControlName="deliveredByUser"></user-search>
+        <section class="order-summary" aria-label="Datos de la orden">
+            <div>
+                <span>Cliente</span
+                ><strong>{{
+                    form.controls.client.value?.name || "Sin cliente"
+                }}</strong>
+            </div>
+            <div>
+                <span>Entrega</span
+                ><strong
+                    >{{
+                        form.controls.deliveredByUser.value?.name ||
+                            "Sin registrar"
+                    }}
+                    {{ form.controls.deliveredByUser.value?.lastname }}</strong
+                >
+            </div>
+            <div>
+                <span>Cotización · ARS por USD</span
+                ><strong>{{
+                    form.controls.exchangeRate.value | number: "1.2-2"
+                }}</strong>
+            </div>
+            <div>
+                <span>Tipo de venta</span
+                ><strong>{{
+                    form.controls.type.value === "wholesale"
+                        ? "Mayorista"
+                        : form.controls.type.value === "faceid"
+                          ? "Tienda"
+                          : "Minorista"
+                }}</strong>
+            </div>
+        </section>
+    } @else {
+        <chips formControlName="type">
+            <chip value="faceid">Tienda</chip>
+            <chip value="sale">Minorista</chip>
+            <chip value="wholesale">Mayorista</chip>
+        </chips>
+        <div class="flex flex-row flex-wrap gap-4 items-center">
+            <div class="min-w-52 flex-[2]">
+                <span>Cliente</span>
+                <client-search formControlName="client"></client-search>
+            </div>
+            <div class="min-w-52 flex-[2]">
+                <span>Usuario que entrega</span>
+                <user-search formControlName="deliveredByUser"></user-search>
+            </div>
+            <div class="min-w-52 flex-1">
+                <span>Cotización (ARS por USD)</span>
+                <p-inputnumber
+                    formControlName="exchangeRate"
+                    type="currency"
+                    prefix="$ "
+                    [min]="0"
+                />
+            </div>
         </div>
-        <div class="min-w-52 flex-1">
-            <span>Cotizacion (USD)</span>
-            <p-inputnumber
-                formControlName="exchangeRate"
-                type="currency"
-                prefix="$ "
-                [min]="0"
-            />
-        </div>
-    </div>
+    }
 
     <div class="card w-full flex flex-col gap-2">
         <h3>Productos</h3>
-        <div class="flex flex-row flex-wrap gap-4 items-center">
-            <div class="min-w-72 flex-[3]">
-                <span>Equipo</span>
-                <product-search formControlName="product"></product-search>
+        @if (!isReadOnly) {
+            <div class="product-entry">
+                <div class="product-selector">
+                    <span>Equipo</span>
+                    <product-search formControlName="product"></product-search>
+                </div>
+                <div class="product-selector">
+                    <span>Accesorios</span>
+                    <product-search
+                        [unique]="false"
+                        formControlName="accesory"
+                        #accesorySearch
+                    ></product-search>
+                </div>
+                <div class="min-w-24 flex-1">
+                    <span>Precio (USD)</span>
+                    <p-inputnumber
+                        formControlName="priceUSD"
+                        type="currency"
+                        prefix="$ "
+                        [min]="0"
+                    />
+                </div>
+                <div class="min-w-24 flex-1">
+                    <span>Precio (ARS)</span>
+                    <p-inputnumber
+                        formControlName="priceARS"
+                        type="currency"
+                        prefix="$ "
+                        [min]="0"
+                    />
+                </div>
+                <div class="min-w-24 flex-1">
+                    <span>Cantidad</span>
+                    <p-inputnumber formControlName="quantity" />
+                </div>
+                <button
+                    class="stroked primary product-add"
+                    (click)="addProduct()"
+                    [disabled]="form.disabled"
+                >
+                    Agregar
+                </button>
             </div>
-            <div class="min-w-72 flex-[3]">
-                <span>Accesorios</span>
-                <product-search
-                    [unique]="false"
-                    formControlName="accesory"
-                    #accesorySearch
-                ></product-search>
-            </div>
-            <div class="min-w-24 flex-1">
-                <span>Precio (USD)</span>
-                <p-inputnumber
-                    formControlName="priceUSD"
-                    type="currency"
-                    prefix="$ "
-                    [min]="0"
-                />
-            </div>
-            <div class="min-w-24 flex-1">
-                <span>Precio (ARS)</span>
-                <p-inputnumber
-                    formControlName="priceARS"
-                    type="currency"
-                    prefix="$ "
-                    [min]="0"
-                />
-            </div>
-            <div class="min-w-24 flex-1">
-                <span>Cantidad</span>
-                <p-inputnumber formControlName="quantity" />
-            </div>
-            <button
-                class="stroked primary self-end min-w-40 md:max-w-40 flex-1"
-                (click)="addProduct()"
-                [disabled]="form.disabled"
-            >
-                Agregar
-            </button>
-        </div>
-        <div class="h-[1px] my-3 bg-background-4 w-full"></div>
+            <div class="h-[1px] my-3 bg-background-4 w-full"></div>
+        }
         <grid
             [data]="products"
-            [config]="orderItemGridConfig"
+            [config]="
+                isReadOnly ? readOnlyProductsGridConfig : orderItemGridConfig
+            "
             (action)="orderItemsGridAction($event)"
         ></grid>
     </div>
@@ -85,23 +136,30 @@
         <div class="flex flex-row justify-between items-center">
             <div class="flex flex-col">
                 <p class="text-xl">
-                    <b>Total a pagar:</b> <br />
+                    <b>{{
+                        isReadOnly ? "Total de la orden:" : "Total a pagar:"
+                    }}</b>
+                    <br />
                     {{ totalUSD | currency: " " }} (USD) <br />
                     {{ totalARS | currency: " " }} (ARS)
                 </p>
             </div>
-            <button
-                class="stroked primary min-w-40 max-w-40 md:max-w-40 flex-1"
-                (click)="newPayment()"
-                [disabled]="form.disabled"
-            >
-                Nuevo Pago
-            </button>
+            @if (!isReadOnly) {
+                <button
+                    class="stroked primary min-w-40 max-w-40 md:max-w-40 flex-1"
+                    (click)="newPayment()"
+                    [disabled]="form.disabled"
+                >
+                    Nuevo Pago
+                </button>
+            }
         </div>
         <div class="h-[1px] my-3 bg-background-4 w-full"></div>
         <grid
             [data]="payments"
-            [config]="paymentsGridConfig"
+            [config]="
+                isReadOnly ? readOnlyPaymentsGridConfig : paymentsGridConfig
+            "
             (action)="paymentGridAction($event)"
         ></grid>
         <div class="h-[1px] w-full bg-background-4"></div>
@@ -113,7 +171,7 @@
                 </span>
                 (USD)
             </span>
-            @if (balanceUSD < 0) {
+            @if (!isReadOnly && balanceUSD < 0) {
                 <button
                     class="stroked primary min-w-40 md:max-w-40 flex-1"
                     (click)="newCashback()"
@@ -124,34 +182,36 @@
             }
         </div>
     </div>
-    <div class="flex flex-row justify-end items-center flex-wrap gap-4">
-        @if (form.controls.type.value === "wholesale") {
-            <button
-                class="stroked primary min-w-40 flex-1"
-                (click)="saveCredit()"
-                [disabled]="!products.length || form.disabled"
-            >
-                Pago a CC
-            </button>
-        }
-        @if (enableRounding) {
-            <button
-                class="stroked primary min-w-40 flex-1"
-                (click)="rounding()"
-                [disabled]="!products.length || form.disabled"
-            >
-                Redondear
-            </button>
-        }
-        <button
-            class="stroked primary min-w-40 md:max-w-40 flex-1"
-            [disabled]="disabledSave"
-            (click)="saveOrder()"
-        >
-            Guardar
-            @if (isDepositing) {
-                y Señar
+    @if (!isReadOnly) {
+        <div class="flex flex-row justify-end items-center flex-wrap gap-4">
+            @if (form.controls.type.value === "wholesale") {
+                <button
+                    class="stroked primary min-w-40 flex-1"
+                    (click)="saveCredit()"
+                    [disabled]="!products.length || form.disabled"
+                >
+                    Pago a CC
+                </button>
             }
-        </button>
-    </div>
+            @if (enableRounding) {
+                <button
+                    class="stroked primary min-w-40 flex-1"
+                    (click)="rounding()"
+                    [disabled]="!products.length || form.disabled"
+                >
+                    Redondear
+                </button>
+            }
+            <button
+                class="stroked primary min-w-40 md:max-w-40 flex-1"
+                [disabled]="disabledSave"
+                (click)="saveOrder()"
+            >
+                Guardar
+                @if (isDepositing) {
+                    y Señar
+                }
+            </button>
+        </div>
+    }
 </form>

@@ -29,7 +29,7 @@ const cases = [
     ['/clients/customer-1', 'Ana Demo'],
     ['/orders', 'Ana Demo'],
     ['/orders/order', 'Nueva orden'],
-    ['/orders/order/order-1', 'Editar orden'],
+    ['/orders/order/order-1', 'Orden completada'],
     ['/purchases', 'Compras a proveedores'],
     ['/dolar', 'Cotización del dólar'],
     ['/settings/store', 'Tu tienda'],

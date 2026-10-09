@@ -1,52 +1,177 @@
-<div class="p-4">
-    <go-back
-        previousRoute="clients"
-        previousRouteName="Clientes"
-        title="{{ client?.name }}"
-    ></go-back>
-
-    <form [formGroup]="clientForm" class="flex flex-col gap-4 mt-5">
-        <div>
-            <label for="name">Nombre *</label>
-            <input formControlName="name" type="text" />
+<section class="client-page">
+    <button type="button" class="back-link" (click)="back()">
+        <icon name="arrow-left" size="16" /> Clientes
+    </button>
+    @if (loading()) {
+        <p role="status">Cargando cliente…</p>
+    } @else if (failed()) {
+        <div class="load-state" role="alert">
+            <p>No se pudo cargar el cliente.</p>
+            <button class="stroked primary" (click)="loadClient()">
+                Reintentar
+            </button>
         </div>
-        <div>
-            <label for="whatsapp">Whatsapp</label>
-            <input formControlName="whatsapp" type="number" />
-        </div>
-        <div>
-            <label for="instagram">Instagram</label>
-            <input
-                formControlName="instagram"
-                type="text"
-                [value]="clientForm.get('instagram')?.value | lowercase"
-            />
-        </div>
-        <div>
-            <label for="identifier">DNI</label>
-            <input formControlName="identifier" type="number" />
-        </div>
-        <div>
-            <label for="identifier">Fecha de Nacimiento</label>
-            <input formControlName="birthDate" type="date" />
-        </div>
-        <div>
-            <label for="address">Dirección</label>
-            <input formControlName="address" type="text" />
-        </div>
-        <div class="flex flex-row justify-between">
-            <label for="address">Mayorista</label>
-            <toggle formControlName="wholesaler"></toggle>
-        </div>
-        <div class="flex flex-row-reverse gap-4">
-            <edit-save-cancel
-                class="flex flex-row-reverse"
-                (cancel)="cancel()"
-                (edit)="edit()"
-                (save)="save()"
-                (del)="deleteClient()"
-                [isEditing]="clientForm.enabled"
-            ></edit-save-cancel>
-        </div>
-    </form>
-</div>
+    } @else if (client) {
+        <header class="client-header">
+            <div>
+                <p class="eyebrow">Ficha del cliente</p>
+                <h1>{{ client.name }}</h1>
+                <span class="client-type">{{
+                    client.wholesaler ? "Mayorista" : "Minorista"
+                }}</span>
+            </div>
+            @if (clientForm.disabled) {
+                <button type="button" class="raised primary" (click)="edit()">
+                    <icon name="pencil" size="16" /> Editar cliente
+                </button>
+            }
+        </header>
+        @if (clientForm.disabled) {
+            <div class="mode-label">
+                <icon name="lock" size="14" /> Solo lectura
+            </div>
+            <div class="client-cards">
+                <section class="client-card">
+                    <h2>Contacto</h2>
+                    <dl>
+                        <div>
+                            <dt>WhatsApp</dt>
+                            <dd>{{ client.phoneNumber || "Sin registrar" }}</dd>
+                        </div>
+                        <div>
+                            <dt>Instagram</dt>
+                            <dd>{{ client.instagram || "Sin registrar" }}</dd>
+                        </div>
+                        <div>
+                            <dt>Dirección</dt>
+                            <dd>{{ client.address || "Sin registrar" }}</dd>
+                        </div>
+                    </dl>
+                </section>
+                <section class="client-card">
+                    <h2>Datos personales</h2>
+                    <dl>
+                        <div>
+                            <dt>Nombre</dt>
+                            <dd>{{ client.name }}</dd>
+                        </div>
+                        <div>
+                            <dt>DNI</dt>
+                            <dd>{{ client.identifier || "Sin registrar" }}</dd>
+                        </div>
+                        <div>
+                            <dt>Fecha de nacimiento</dt>
+                            <dd>{{ birthDateLabel }}</dd>
+                        </div>
+                    </dl>
+                </section>
+            </div>
+            <div class="delete-area">
+                <button
+                    type="button"
+                    class="delete-link"
+                    (click)="deleteClient()"
+                >
+                    Eliminar cliente
+                </button>
+            </div>
+        } @else {
+            <form
+                [formGroup]="clientForm"
+                (submit)="$event.preventDefault(); save()"
+            >
+                <p class="editing-label">Editando datos del cliente</p>
+                <fieldset [disabled]="saving()" class="client-cards">
+                    <section class="client-card">
+                        <h2>Contacto</h2>
+                        <div class="fields">
+                            <div>
+                                <label for="whatsapp">WhatsApp</label
+                                ><input
+                                    id="whatsapp"
+                                    formControlName="whatsapp"
+                                    type="tel"
+                                    autocomplete="tel"
+                                />
+                            </div>
+                            <div>
+                                <label for="instagram">Instagram</label
+                                ><input
+                                    id="instagram"
+                                    formControlName="instagram"
+                                    type="text"
+                                />
+                            </div>
+                            <div>
+                                <label for="address">Dirección</label
+                                ><input
+                                    id="address"
+                                    formControlName="address"
+                                    type="text"
+                                    autocomplete="street-address"
+                                />
+                            </div>
+                        </div>
+                    </section>
+                    <section class="client-card">
+                        <h2>Datos personales</h2>
+                        <div class="fields">
+                            <div>
+                                <label for="name">Nombre *</label
+                                ><input
+                                    id="name"
+                                    formControlName="name"
+                                    type="text"
+                                    autocomplete="name"
+                                />
+                            </div>
+                            <div>
+                                <label for="identifier">DNI</label
+                                ><input
+                                    id="identifier"
+                                    formControlName="identifier"
+                                    type="text"
+                                    inputmode="numeric"
+                                />
+                            </div>
+                            <div>
+                                <label for="birthDate"
+                                    >Fecha de nacimiento</label
+                                ><input
+                                    id="birthDate"
+                                    formControlName="birthDate"
+                                    type="date"
+                                />
+                            </div>
+                        </div>
+                    </section>
+                </fieldset>
+                <div class="wholesale-setting">
+                    <div>
+                        <label>Cliente mayorista</label>
+                        <p>
+                            Permite seleccionar al cliente en ventas mayoristas.
+                        </p>
+                    </div>
+                    <toggle formControlName="wholesaler" />
+                </div>
+                <div class="form-actions">
+                    <button
+                        type="button"
+                        class="stroked primary"
+                        [disabled]="saving()"
+                        (click)="cancel()"
+                    >
+                        Cancelar</button
+                    ><button
+                        type="submit"
+                        class="raised primary"
+                        [disabled]="saving()"
+                    >
+                        {{ saving() ? "Guardando…" : "Guardar cambios" }}
+                    </button>
+                </div>
+            </form>
+        }
+    }
+</section>

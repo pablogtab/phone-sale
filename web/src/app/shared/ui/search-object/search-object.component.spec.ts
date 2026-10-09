@@ -69,7 +69,7 @@ describe('entity selector requests', () => {
         vi.advanceTimersByTime(180);
         const request = http.expectOne('/test-search?query=iPhone+%26+Pro');
         request.flush([{ id: 1, name: 'iPhone Pro' }]);
-        expect(component.options).toEqual([{ id: 1, name: 'iPhone Pro' }]);
+        expect(component.options()).toEqual([{ id: 1, name: 'iPhone Pro' }]);
         expect(component.loading()).toBe(false);
     });
     it('cancels old results so they cannot replace the latest selection list', () => {
@@ -83,7 +83,7 @@ describe('entity selector requests', () => {
         http.expectOne('/test-search?query=new').flush([
             { id: 2, name: 'Latest' },
         ]);
-        expect(component.options[0].name).toBe('Latest');
+        expect(component.options()[0].name).toBe('Latest');
     });
     it('recovers after a failed request without mutating domain objects', () => {
         const component = screen().componentInstance;
@@ -94,14 +94,16 @@ describe('entity selector requests', () => {
             { status: 500, statusText: 'Failed' },
         );
         expect(component.failed()).toBe(true);
-        expect(component.options).toEqual([]);
+        expect(component.options()).toEqual([]);
         component.search('retry');
         vi.advanceTimersByTime(180);
         const value = { id: 3, name: 'Recovered' };
         http.expectOne('/test-search?query=retry').flush([value]);
         expect(component.failed()).toBe(false);
-        expect(component.displayLabel(component.options[0])).toBe('Recovered');
-        expect(Object.keys(component.options[0])).toEqual(['id', 'name']);
+        expect(component.displayLabel(component.options()[0])).toBe(
+            'Recovered',
+        );
+        expect(Object.keys(component.options()[0])).toEqual(['id', 'name']);
     });
     it('opens the dropdown when async suggestions arrive', () => {
         const fixture = screen();

@@ -1,7 +1,106 @@
-tr {
-    text-align: left !important;
+.order-page {
+    width: 100%;
+    container-type: inline-size;
+    margin: 0 auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 64px;
+}
+.readonly-notice {
+    border: 1px solid #cbdcca;
+    border-radius: 12px;
+    padding: 16px 18px;
+    background: #eaf2e7;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #325c3c;
+}
+.readonly-notice strong {
+    font-size: 15px;
+}
+.readonly-notice p {
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.order-summary {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1.5fr 1fr;
+    gap: 20px;
+    background: white;
+    border: 1px solid var(--background-4);
+    border-radius: 12px;
+    padding: 20px;
+}
+.order-summary > div {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.order-summary span {
+    font-size: 12px;
+    color: var(--text-gray-500);
+}
+.order-summary strong {
+    font-size: 14px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+    .order-summary {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px 16px;
+    }
+}
+@media (max-width: 440px) {
+    .order-summary {
+        grid-template-columns: 1fr;
+    }
 }
 
-tr :last-child {
-    text-align: center;
+.product-entry {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 16px;
+    align-items: end;
+}
+.product-entry > div {
+    min-width: 0;
+    grid-column: span 2;
+}
+.product-entry > .product-selector {
+    grid-column: span 3;
+}
+.product-entry > div:nth-child(5) {
+    grid-column: span 1;
+}
+.product-add {
+    width: 100%;
+    min-height: 44px;
+}
+@container (min-width: 1100px) {
+    .product-entry {
+        grid-template-columns: minmax(0, 3fr) minmax(
+                0,
+                2fr
+            ) 110px 130px 90px 128px;
+    }
+    .product-entry > div,
+    .product-entry > .product-selector {
+        grid-column: span 1;
+    }
+}
+@container (max-width: 560px) {
+    .product-entry > .product-selector {
+        grid-column: span 6;
+    }
+    .product-entry > div,
+    .product-entry > div:nth-child(5),
+    .product-add {
+        grid-column: span 3;
+    }
 }
