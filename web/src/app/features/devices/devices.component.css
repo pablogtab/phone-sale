@@ -111,6 +111,31 @@ h1 {
     color: var(--muted);
     overflow-wrap: anywhere;
 }
+.grading-badge {
+    align-self: flex-start;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #eef0f2;
+    color: #4b5563;
+}
+.grading-badge[data-grade="excellent"] {
+    background: #dcefe2;
+    color: #235a36;
+}
+.grading-badge[data-grade="veryGood"] {
+    background: #e1edf9;
+    color: #285582;
+}
+.grading-badge[data-grade="good"] {
+    background: #fff0ce;
+    color: #79530e;
+}
+.grading-badge[data-grade="fair"] {
+    background: #fae4dc;
+    color: #8b3e29;
+}
 .missing-purchase {
     font-size: 10px;
     color: #a17938;

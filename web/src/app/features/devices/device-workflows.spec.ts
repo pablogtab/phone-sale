@@ -157,6 +157,28 @@ describe('inventory workflows', () => {
         t.component.cancel();
         expect(t.ref.close).toHaveBeenCalledWith(false);
     });
+    it.each([
+        ['excellent', 'A+ · Excelente'],
+        ['veryGood', 'A · Muy bueno'],
+        ['good', 'B · Bueno'],
+        ['fair', 'C · Regular'],
+        ['ungraded', 'Sin calificar'],
+    ])('shows the used grade %s in inventory and hides it for sealed phones', async (code, description) => {
+        const t = dialogTest(DevicesComponent);
+        await t.render();
+        t.component.loadDevices();
+        t.http.expectOne((r) => r.url.startsWith('/api/devices/devices')).flush([{ ...device, condition: 'used', equipmentGrading: code === 'ungraded' ? undefined : { id: 1, code, description, index: 0 } }]);
+        t.fixture.detectChanges();
+        await t.fixture.whenStable();
+        const badge = t.fixture.nativeElement.querySelector('.grading-badge') as HTMLElement;
+        expect(badge.textContent.trim()).toBe(description);
+        expect(badge.dataset['grade']).toBe(code);
+        expect(badge.getAttribute('aria-label')).toBe(`Calificación del equipo: ${description}`);
+        t.component.loadDevices();
+        t.http.expectOne((r) => r.url.startsWith('/api/devices/devices')).flush([{ ...device, condition: 'sealed' }]);
+        t.fixture.detectChanges();
+        expect(t.fixture.nativeElement.querySelector('.grading-badge')).toBeNull();
+    });
     it('keeps newer inventory search results when an old request finishes', async () => {
         const t = dialogTest(DevicesComponent);
         await t.render();

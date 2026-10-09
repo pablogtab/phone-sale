@@ -83,7 +83,15 @@
                                     ><span class="device-description">{{
                                         device.description
                                     }}</span
-                                    ><span class="device-meta"
+                                    >
+                                    @if (device.condition === 'used') {
+                                        <span class="grading-badge"
+                                            [attr.data-grade]="device.equipmentGrading?.code ?? 'ungraded'"
+                                            [attr.aria-label]="'Calificación del equipo: ' + (device.equipmentGrading?.description ?? 'Sin calificar')">
+                                            {{ device.equipmentGrading?.description ?? 'Sin calificar' }}
+                                        </span>
+                                    }
+                                    <span class="device-meta"
                                         >Equipo #{{ device.id }}
                                         @if (device.imei) {
                                             · IMEI {{ device.imei }}

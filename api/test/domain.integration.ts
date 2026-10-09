@@ -612,6 +612,8 @@ async function main() {
   assert.equal(usedDemo.gradingId, gradings[0].id);
   const detail = await request(`devices/devices/${usedDemo.id}`);
   assert.equal(detail.equipmentGrading.description, gradings[0].description);
+  const inventoryWithGrades = await request('devices/devices');
+  assert.equal(inventoryWithGrades.find((device) => device.id === usedDemo.id).equipmentGrading.code, gradings[0].code);
   const { DeviceService: GradingDeviceService } = await import('../src/modules/devices/services/device.service');
   await assert.rejects(app.get(GradingDeviceService).updateDevice(usedDemo.id, { ...usedDemo, gradingId: 999999 }), /Calificación/);
   await request(`devices/devices/${usedDemo.id}`, 'PATCH', { ...{ modelId: usedDemo.modelId, storageSizeId: usedDemo.storageSizeId, colorId: usedDemo.colorId, condition: 'used', hasProblem: false, oficialWarranty: false }, gradingId: gradings[2].id });

@@ -207,7 +207,7 @@ export class DeviceService {
         },
         ...condition,
       })),
-      relations: { files: true },
+      relations: { files: true, equipmentGrading: true },
     });
 
     return devices.map(({ files, ...d }) => ({
