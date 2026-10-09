@@ -1,0 +1,57 @@
+<section class="dashboard" [attr.aria-busy]="loading()">
+    <header class="dashboard-header">
+        <div><h1>Resumen</h1><p>Ventas del período y estado actual de tu tienda.</p></div>
+        <div class="dashboard-controls">
+            <label class="period-field">Período<select [value]="days()" (change)="selectPeriod($event)"><option value="7">Últimos 7 días</option><option value="30">Últimos 30 días</option><option value="90">Últimos 90 días</option></select></label>
+            <button type="button" class="refresh-button" (click)="reload()" [disabled]="loading()"><i class="pi pi-refresh" aria-hidden="true"></i>Actualizar</button>
+        </div>
+    </header>
+    @if (loading()) {
+        <div class="dashboard-feedback" role="status"><i class="pi pi-spinner pi-spin" aria-hidden="true"></i>Cargando métricas…</div>
+    } @else if (error()) {
+        <div class="dashboard-feedback" role="alert"><p>No pudimos cargar el resumen.</p><button type="button" (click)="reload()">Reintentar</button></div>
+    } @else if (summary(); as data) {
+        <div class="metrics">
+            <article class="metric"><span>Ventas completadas</span><strong>{{ data.sales.totalUSD | number:'1.2-2' }} <small>USD</small></strong><p>{{ data.sales.totalARS | number:'1.2-2' }} ARS</p><a routerLink="/orders">Ver ventas <span aria-hidden="true">↗</span></a></article>
+            <article class="metric"><span>Órdenes completadas</span><strong>{{ data.sales.orders | number }}</strong><p>{{ data.sales.units | number }} unidades vendidas</p><span class="metric-note">Ticket promedio: {{ data.sales.averageUSD | number:'1.2-2' }} USD</span></article>
+            <article class="metric"><span>Equipos disponibles</span><strong>{{ data.inventory.available | number }}</strong><p>{{ data.accessoriesUnits | number }} unidades de accesorios</p><a routerLink="/devices">Ver inventario <span aria-hidden="true">↗</span></a></article>
+            <article class="metric"><span>Costo del stock de equipos</span><strong>{{ data.inventory.valueUSD | number:'1.2-2' }} <small>USD</small></strong><p>Incluye reservados, reparación, tránsito y dañados.</p><span class="metric-note">{{ data.customers | number }} clientes registrados</span></article>
+        </div>
+        <div class="dashboard-grid">
+            <article class="panel sales-panel">
+                <div class="panel-heading"><div><h2>Ventas por día</h2><p>Importe en USD de órdenes completadas.</p></div><span class="period-caption">{{ dayLabel(data.series[0].date) }} – {{ dayLabel(data.series[data.series.length - 1].date) }}</span></div>
+                @if (hasSales()) {
+                    <div class="chart" role="list" aria-label="Ventas diarias en USD">
+                        @for (day of data.series; track day.date) {
+                            <div class="chart-column" role="listitem" tabindex="0" [attr.aria-label]="dayLabel(day.date) + ': ' + (day.totalUSD | number:'1.2-2') + ' USD, ' + day.orders + ' órdenes'">
+                                <span class="chart-tooltip">{{ dayLabel(day.date) }} · {{ day.totalUSD | number:'1.2-2' }} USD · {{ day.orders }} órdenes</span>
+                                <span class="chart-track"><span class="chart-bar" [style.height.%]="day.totalUSD / maxSale() * 100" [class.zero]="!day.totalUSD"></span></span>
+                            </div>
+                        }
+                    </div>
+                    <div class="chart-axis"><span>{{ dayLabel(data.series[0].date) }}</span><span>{{ dayLabel(data.series[data.series.length - 1].date) }}</span></div>
+                } @else {
+                    <div class="chart-empty"><i class="pi pi-chart-bar" aria-hidden="true"></i><strong>Sin ventas completadas en este período</strong><span>Elegí otro período para consultar el historial.</span></div>
+                }
+                <p class="panel-footnote">Las señas y órdenes pendientes se muestran por separado. Los importes usan la cotización guardada en cada venta.</p>
+            </article>
+            <article class="panel">
+                <div class="panel-heading"><div><h2>Estado del inventario</h2><p>Equipos registrados, excluye vendidos.</p></div></div>
+                <ul class="stock-list">@for (status of stock(); track status.label) { <li><span><i [style.background]="status.color" aria-hidden="true"></i>{{ status.label }}</span><strong>{{ status.count | number }}</strong></li> }</ul>
+                <div class="pipeline"><a routerLink="/orders"><strong>{{ data.pipeline.pending }}</strong> Órdenes pendientes</a><a routerLink="/orders"><strong>{{ data.pipeline.deposited }}</strong> Órdenes señadas</a></div>
+            </article>
+            <article class="panel balance-panel">
+                <div class="panel-heading"><div><h2>Saldos actuales</h2><p>No dependen del período seleccionado.</p></div></div>
+                <div class="balances"><div><span>Cajas</span><strong>{{ data.balances.cashUSD | number:'1.2-2' }} USD</strong><p>{{ data.balances.cashARS | number:'1.2-2' }} ARS</p></div><div><span>Bancos</span><strong>{{ data.balances.bankUSD | number:'1.2-2' }} USD</strong><p>{{ data.balances.bankARS | number:'1.2-2' }} ARS</p></div></div>
+                <a class="rate" routerLink="/dolar">Cotización manual: @if (data.exchangeRate) { <strong>{{ data.exchangeRate | number:'1.2-2' }} ARS/USD</strong> } @else { <strong>Sin configurar</strong> } <span aria-hidden="true">↗</span></a>
+            </article>
+            <article class="panel recent-panel">
+                <div class="panel-heading"><div><h2>Últimas órdenes del período</h2><p>Completadas, pendientes, señadas y canceladas.</p></div><a routerLink="/orders">Ver todas</a></div>
+                @if (data.recentOrders.length) {
+                    <ul class="recent-orders">@for (order of data.recentOrders; track order.publicId) { <li><a [routerLink]="['/orders/order', order.publicId]"><span class="order-client"><strong>{{ order.clientName || 'Sin cliente' }}</strong><small>{{ order.createdAt | date:'dd/MM/yyyy HH:mm':'-0300' }}</small></span><span class="order-amount">{{ order.totalUSD | number:'1.2-2' }} USD <small>{{ order.totalARS | number:'1.2-2' }} ARS</small></span><span class="order-status" [attr.data-status]="order.status">{{ labels[order.status] || order.status }}</span><i class="pi pi-chevron-right" aria-hidden="true"></i></a></li> }</ul>
+                } @else { <p class="recent-empty">No hay órdenes en este período.</p> }
+            </article>
+        </div>
+        <p class="updated-at">Actualizado: {{ data.period.to | date:'dd/MM/yyyy HH:mm':'-0300' }} · Horario de Argentina</p>
+    }
+</section>

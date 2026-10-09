@@ -62,6 +62,7 @@ export class EditDeviceComponent {
     form = new FormGroup({
         model: new FormControl<DeviceModel>(null),
         sealed: new FormControl(false),
+        gradingId: new FormControl<number | null>(null),
         batteryHealth: new FormControl(null, [
             Validators.min(0),
             Validators.max(100),
@@ -94,7 +95,17 @@ export class EditDeviceComponent {
     aditionalFiles: DeviceFile[] = [];
     aditionalFilesToUpload: ToUploadFile[] = [];
 
+    gradings: import('@/app/core/models/device').EquipmentGrading[] = [];
+    gradingError = false;
+    loadGradings() {
+        this.gradingError = false;
+        this.deviceService.getGradings().pipe(refreshView(this.viewChangeDetector, this.viewLifetime)).subscribe({
+            next: values => this.gradings = values,
+            error: () => this.gradingError = true,
+        });
+    }
     ngOnInit(): void {
+        this.loadGradings();
         this.form.controls.model.valueChanges
             .pipe(refreshView(this.viewChangeDetector, this.viewLifetime))
             .subscribe((model) => {
@@ -158,6 +169,7 @@ export class EditDeviceComponent {
                 this.form.controls.publicComments.setValue(
                     device.publicComments,
                 );
+                this.form.controls.gradingId.setValue(device.gradingId ?? null);
                 this.form.controls.depreciation.setValue(device.depreciation);
                 this.mainPhotoUrl = device.mainPhotoUrl;
                 this.aditionalFiles = device.aditionalFiles.sort(
@@ -408,6 +420,7 @@ export class EditDeviceComponent {
             aditionalFiles: this.aditionalFilesToUpload,
             originProviderId: values.originProvider?.id,
             purchasePrice: values.purchasePrice,
+            gradingId: values.sealed ? null : values.gradingId,
             depreciation: values.depreciation,
         };
     }

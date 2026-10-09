@@ -4,6 +4,7 @@ import { Client as PgClient } from 'pg';
 import { DataSource } from 'typeorm';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, INestApplication } from '@nestjs/common';
+import { IPHONE_CATALOG } from '../src/database/iphone-catalog';
 import { createPassword } from '../src/auth/password';
 
 const databaseName = `phone_sale_test_${process.pid}_${Date.now()}`;
@@ -59,7 +60,7 @@ async function main() {
   const { Repositories } = await import('../src/database/database.service');
   migrationSource = new DataSource(databaseOptions);
   await migrationSource.initialize();
-  assert.equal((await migrationSource.runMigrations()).length, 1);
+  assert.equal((await migrationSource.runMigrations()).length, 2);
   assert.equal((await migrationSource.runMigrations()).length, 0);
   pass('fresh migration and repeat migration');
   const seedDb = new Repositories(migrationSource.manager);
@@ -563,11 +564,12 @@ async function main() {
   const demo = await seedDemo(app, seedOptions);
   assert.equal(demo.created, true);
   assert.equal(demo.clients, 8);
-  assert.equal(demo.orders, 6);
+  assert.equal(demo.orders, 36);
+  assert.equal(demo.devices, IPHONE_CATALOG.length + 60);
   const demoOrders = await db.order.find({
     where: { client: { identifier: (await import('typeorm')).Like('DEMO-%') } },
   });
-  assert.equal(demoOrders.length, 6);
+  assert.equal(demoOrders.length, 36);
   for (const status of ['confirmed', 'deposited', 'pending', 'cancelled'])
     assert.ok(
       demoOrders.some((order) => order.status === status),
@@ -582,6 +584,8 @@ async function main() {
     'repairing',
     'reserved',
     'sold',
+    'damaged',
+    'lost',
   ])
     assert.ok(
       states.has(status as any),
@@ -602,12 +606,55 @@ async function main() {
       `Account ${account.id} balance differs from its movements`,
     );
   }
+  const gradings = await request('equipment-grading');
+  assert.equal(gradings.length, 4);
+  const usedDemo = await db.device.findOneOrFail({ where: { condition: 'used', imei: '999100000000001' } });
+  assert.equal(usedDemo.gradingId, gradings[0].id);
+  const detail = await request(`devices/devices/${usedDemo.id}`);
+  assert.equal(detail.equipmentGrading.description, gradings[0].description);
+  const { DeviceService: GradingDeviceService } = await import('../src/modules/devices/services/device.service');
+  await assert.rejects(app.get(GradingDeviceService).updateDevice(usedDemo.id, { ...usedDemo, gradingId: 999999 }), /Calificación/);
+  await request(`devices/devices/${usedDemo.id}`, 'PATCH', { ...{ modelId: usedDemo.modelId, storageSizeId: usedDemo.storageSizeId, colorId: usedDemo.colorId, condition: 'used', hasProblem: false, oficialWarranty: false }, gradingId: gradings[2].id });
+  assert.equal((await db.device.findOneByOrFail({ id: usedDemo.id })).gradingId, gradings[2].id);
+  pass('used equipment grading catalog, persistence, detail and invalid reference rejection');
   const demoSnapshot = await snapshot();
   assert.equal((await seedDemo(app, seedOptions)).created, false);
   assert.deepEqual(await snapshot(), demoSnapshot);
   pass(
     'complete demo states, accounting coherence and repeat seed without duplicates',
   );
+
+  await request('dashboard', 'GET', undefined, 401, '');
+  await request('dashboard', 'GET', undefined, 403, staffToken);
+  for (const days of ['0', '31', '30.5', 'no']) await request(`dashboard?days=${days}`, 'GET', undefined, 400);
+  await request('dashboard?unknown=1', 'GET', undefined, 400);
+  const summary = await request('dashboard?days=30');
+  const ordersForMetrics = await db.order.find({ relations: { items: true } });
+  const completed = ordersForMetrics.filter(order => !order.deletedAt && order.status === 'confirmed' && order.createdAt >= new Date(summary.period.from) && order.createdAt <= new Date(summary.period.to));
+  assert.equal(summary.sales.orders, completed.length);
+  assert.ok(Math.abs(summary.sales.totalUSD - completed.reduce((sum, order) => sum + order.items.reduce((n, item) => n + item.priceUSD * item.quantity, 0), 0)) < 0.001);
+  assert.ok(Math.abs(summary.sales.totalARS - completed.reduce((sum, order) => sum + order.items.reduce((n, item) => n + item.priceARS * item.quantity, 0), 0)) < 0.001);
+  assert.equal(summary.sales.units, completed.reduce((sum, order) => sum + order.items.reduce((n, item) => n + item.quantity, 0), 0));
+  assert.equal(summary.series.length, 30);
+  assert.ok(summary.series.filter(day => day.orders > 0).length >= 15);
+  assert.ok(summary.balances.cashARS > 0 && summary.balances.bankARS > 0);
+  const week = await request('dashboard?days=7');
+  const quarter = await request('dashboard?days=90');
+  assert.ok(week.sales.orders < summary.sales.orders);
+  assert.ok(summary.sales.orders < quarter.sales.orders);
+  assert.ok(quarter.series.filter(day => day.orders > 0).length >= 24);
+  assert.equal(summary.series.reduce((sum, day) => sum + day.orders, 0), summary.sales.orders);
+  assert.ok(Math.abs(summary.series.reduce((sum, day) => sum + day.totalUSD, 0) - summary.sales.totalUSD) < 0.001);
+  const devicesForMetrics = (await db.device.find()).filter(device => !device.deletedAt);
+  assert.equal(summary.inventory.available, devicesForMetrics.filter(device => device.status === 'available').length);
+  assert.equal(summary.inventory.total, devicesForMetrics.length);
+  assert.equal(summary.customers, (await db.client.find()).filter(client => !client.deletedAt).length);
+  const accountsForMetrics = (await db.accountingAccount.find()).filter(account => !account.deletedAt);
+  for (const [key, type, currency] of [['cashUSD','cash_account','usd'], ['cashARS','cash_account','ars'], ['bankUSD','bank','usd'], ['bankARS','bank','ars']]) {
+    assert.ok(Math.abs(summary.balances[key] - accountsForMetrics.filter(account => account.type === type && account.currency === currency).reduce((sum, account) => sum + account.balance, 0)) < 0.001);
+  }
+  for (const days of [7, 90]) assert.equal((await request(`dashboard?days=${days}`)).series.length, days);
+  pass('dashboard real aggregates, statuses, currencies, calendar gaps, period validation and admin authorization');
 
   console.log(
     `${checks} integration checks passed; temporary database cleaned up.`,

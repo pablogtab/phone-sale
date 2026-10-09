@@ -20,3 +20,37 @@
     .draggable-box:not(.cdk-drag-placeholder) {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
+
+.device-form {
+    padding: 20px 24px 24px;
+}
+
+.device-form-actions {
+    position: sticky;
+    bottom: -24px;
+    display: flex;
+    justify-content: flex-end;
+    margin: 4px -24px -24px;
+    padding: 16px 24px 24px;
+    background: var(--background-2);
+    border-top: 1px solid var(--background-3);
+    z-index: 2;
+}
+
+.device-form-actions button {
+    min-width: 170px;
+}
+
+@media (max-width: 640px) {
+    .device-form { padding: 16px; }
+    .device-form-actions { bottom: -16px; margin: 4px -16px -16px; padding: 16px; }
+    .device-form-actions button { width: 100%; }
+}
+
+.device-grading { border: 0; padding: 0; margin: 0; min-width: 0; }
+.device-grading legend { font-size: 1rem; font-weight: 600; }
+.device-grading p { color: var(--text-2); font-size: .85rem; margin: 4px 0 12px; }
+.grading-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.grading-options label { display: flex; align-items: center; gap: 8px; padding: 12px; border: 1px solid var(--background-4); border-radius: 10px; cursor: pointer; font-size: .875rem; }
+.grading-options label.selected { background: var(--green-1); border-color: var(--primary); }
+.grading-options input { width: 16px; min-height: 0; accent-color: var(--primary); }

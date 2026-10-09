@@ -1,3 +1,4 @@
+import { EquipmentGradingEntity } from './equipment-grading.entity';
 import { AccountingAccountEntity } from './accounting-account.entity';
 import { AccountingTransactionEntity } from './accounting-transaction.entity';
 import { BankEntity } from './bank.entity';
@@ -24,6 +25,7 @@ import { UserAuthEntity } from './user-auth.entity';
 export * from './models';
 
 export const entities = [
+  EquipmentGradingEntity,
   AccountingAccountEntity,
   AccountingTransactionEntity,
   BankEntity,

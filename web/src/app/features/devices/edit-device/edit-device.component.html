@@ -1,5 +1,5 @@
 <dialog-header [title]="data.title"></dialog-header>
-<form [formGroup]="form" class="flex flex-col justify-between p-4 gap-5">
+<form [formGroup]="form" class="device-form flex flex-col gap-5">
     <div>
         <span class="text-lg font-medium">Modelo</span>
         <device-model-search formControlName="model"></device-model-search>
@@ -43,6 +43,26 @@
         </div>
     }
 
+    @if (!form.controls.sealed.value) {
+        <fieldset class="device-grading">
+            <legend>Calificación del equipo usado</legend>
+            <p>Elegí el estado estético y general del equipo.</p>
+            @if (gradingError) {
+                <span>No se pudieron cargar las calificaciones.</span>
+                <button type="button" class="outlined" (click)="loadGradings()">Reintentar</button>
+            } @else {
+                <div class="grading-options">
+                    @for (grading of gradings; track grading.id) {
+                        <label [class.selected]="form.controls.gradingId.value === grading.id">
+                            <input type="radio" formControlName="gradingId" [value]="grading.id" />
+                            {{ grading.description }}
+                        </label>
+                    }
+                    <label [class.selected]="form.controls.gradingId.value === null"><input type="radio" formControlName="gradingId" [value]="null" />Sin calificar</label>
+                </div>
+            }
+        </fieldset>
+    }
     <div class="flex flex-row items-center gap-4 justify-between">
         <span class="text-lg font-medium">Equipo Sellado</span>
         <toggle formControlName="sealed"></toggle>
@@ -281,11 +301,13 @@
         </div>
     </div>
 
-    <button class="raised primary mt-1" (click)="save()">
+    <footer class="device-form-actions">
+    <button type="button" class="raised primary" (click)="save()">
         @if (isEdit) {
             <span>Guardar cambios</span>
         } @else {
             <span>Guardar</span>
         }
     </button>
+    </footer>
 </form>

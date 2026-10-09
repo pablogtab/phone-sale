@@ -5,6 +5,8 @@ import {
   Allow,
   IsBoolean,
   IsIn,
+  IsInt,
+  Min,
   IsNumber,
   IsOptional,
   IsString,
@@ -13,6 +15,12 @@ import {
 } from 'class-validator';
 
 export class CreateDeviceDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Transform(({ value }) => value === null || value === '' ? null : Number(value))
+  gradingId?: number | null;
+
   @IsString()
   @IsIn(Object.keys(DEVICE_CONDITIONS))
   condition: DeviceCondition;

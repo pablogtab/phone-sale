@@ -34,6 +34,8 @@ export class IconComponent {
 }
 
 export const ICONS = {
+    'chart-bar': 'chart-bar',
+    box: 'box',
     'add-circle': 'plus-circle',
     'less-circle': 'minus-circle',
     settings: 'cog',

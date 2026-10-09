@@ -1,3 +1,4 @@
+import { dashboardFixture } from './dashboard-fixture';
 import { Product } from '@/app/core/models/product';
 export const cashEntity = {
     id: 1,
@@ -140,6 +141,8 @@ export const page = (data: unknown[]) => ({
 });
 export function responseFor(url: string): unknown {
     const path = url.split('?')[0].replace(/\/$/, '');
+    if (path === '/api/equipment-grading') return [{ id: 1, code: 'excellent', description: 'A+ · Excelente', index: 0 }, { id: 2, code: 'good', description: 'B · Bueno', index: 1 }];
+    if (path === '/api/dashboard') return dashboardFixture;
     if (path === '/api/store-settings') return { name: 'Mi tienda' };
     if (path === '/api/users/me' || path === '/api/users/1') return user;
     if (path === '/api/users/search') return [user];

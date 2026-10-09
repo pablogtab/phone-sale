@@ -5,6 +5,7 @@ export const DeviceEntity = new EntitySchema<Device>({
   name: 'Device',
   tableName: 'devices',
   columns: {
+    gradingId: { type: "integer", nullable: true },
     id: {
       type: 'integer',
       nullable: false,
@@ -153,6 +154,7 @@ export const DeviceEntity = new EntitySchema<Device>({
     },
   },
   relations: {
+    equipmentGrading: { type: "many-to-one", target: "EquipmentGrading", joinColumn: { name: "gradingId" }, nullable: true },
     model: {
       type: 'many-to-one',
       target: 'DeviceModel',

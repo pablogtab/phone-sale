@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 
 @Component({
     selector: 'app-page-state',
@@ -17,7 +17,7 @@ import { Component, input, output } from '@angular/core';
             aria-hidden="true"
         ></i>
         <h3>{{ title() }}</h3>
-        <p>{{ description() }}</p>
+        <p>{{ description() || defaultDescription() }}</p>
         @if (kind() === 'error') {
             <button type="button" (click)="retry.emit()">
                 Volver a intentar
@@ -60,6 +60,7 @@ import { Component, input, output } from '@angular/core';
 export class PageStateComponent {
     readonly kind = input<'loading' | 'empty' | 'error'>('empty');
     readonly title = input('Todavía no hay registros');
-    readonly description = input('Los nuevos registros aparecerán acá.');
+    readonly description = input('');
+    readonly defaultDescription = computed(() => this.kind() === 'loading' ? 'Esperá un momento mientras cargamos los datos.' : this.kind() === 'error' ? 'Revisá la conexión y volvé a intentar.' : 'Los nuevos registros aparecerán acá.');
     readonly retry = output<void>();
 }

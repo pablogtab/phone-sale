@@ -1,9 +1,8 @@
 <section class="p-4">
-    <p class="feature-description">Referencias de compra y venta por modelo.</p>
 
     <go-back
         title="Precios de Referencia"
-        previousRouteName="Home"
+        previousRouteName="Resumen"
         previousRoute="/"
     ></go-back>
 
@@ -17,7 +16,7 @@
     >
     </edit-save-cancel>
 
-    <h3 class="mt-4">Precios de Venta Nuevos</h3>
+    <h3 class="mt-4">Precios de venta · Equipos sellados</h3>
 
     <div
         [ngTemplateOutlet]="modelsTemplate"
@@ -25,7 +24,7 @@
     ></div>
 </section>
 <section class="p-4">
-    <h3 class="mt-4">Precios de Venta Usados</h3>
+    <h3 class="mt-4">Precios de venta · Equipos usados</h3>
     <div
         [ngTemplateOutlet]="modelsTemplate"
         [ngTemplateOutletContext]="{ dataSource: usedModels }"
@@ -72,7 +71,7 @@
             </ng-container>
             <ng-container cdkColumnDef="sellingPriceSale">
                 <th cdk-header-cell *cdkHeaderCellDef class="text-left">
-                    Precio Sale
+                    Precio minorista
                 </th>
                 <td cdk-cell *cdkCellDef="let element">
                     <input

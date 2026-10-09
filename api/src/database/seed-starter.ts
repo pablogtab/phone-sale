@@ -133,5 +133,9 @@ export async function seedStarter(
   await db.parameter.save(
     db.parameter.create({ ...marker, key, valueS: JSON.stringify(ids) }),
   );
+  for (const [index, [code, description]] of Object.entries(STARTER_LABELS.equipmentGradings).entries()) {
+    const existing = await db.equipmentGrading.findOneBy({ code });
+    await db.equipmentGrading.save(db.equipmentGrading.create({ ...(existing || {}), code, description, index }));
+  }
   return { user, ids };
 }

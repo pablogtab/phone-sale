@@ -1,7 +1,5 @@
 <section class="p-4 md:px-8">
-    <p class="feature-description">
-        Modelos, colores y capacidades para tu inventario.
-    </p>
+
 
     <div class="flex flex-row justify-between content-center">
         <h1>Modelos</h1>
@@ -36,6 +34,9 @@
         </div>
     </div>
 
+    <p class="feature-description">
+        Modelos, colores y capacidades para tu inventario.
+    </p>
     @if (loading()) {
         <p role="status">Cargando modelos…</p>
     } @else if (failed()) {

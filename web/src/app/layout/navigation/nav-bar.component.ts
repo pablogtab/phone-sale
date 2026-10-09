@@ -40,6 +40,7 @@ export class NavBarComponent implements OnInit {
                 next: (data) => {
                     if (!data) return;
                     const allMenuOptions: MenuOption[] = [
+                        { icon: 'chart-bar', label: 'Resumen', route: '/dashboard', condition: () => data.role === ROLES.admin },
                         {
                             icon: 'dollar-circle',
                             label: 'Dólar',

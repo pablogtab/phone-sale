@@ -248,7 +248,7 @@ export class DeviceController {
   ) {
     delete obj['aditionalFilesDescriptions'];
 
-    if (files.mainPhoto) {
+    if (files?.mainPhoto) {
       const mainPhoto = await this.fileService.uploadFile(files.mainPhoto[0], {
         allowedTypes: 'image',
         optimizeImage: true,
@@ -256,7 +256,7 @@ export class DeviceController {
       obj.mainPhotoUrl = mainPhoto.url;
     }
 
-    if (files.aditionalFiles) {
+    if (files?.aditionalFiles) {
       const aditionalFiles = await Promise.all(
         files.aditionalFiles.map(async (file) => {
           return await this.fileService.uploadFile(file, {

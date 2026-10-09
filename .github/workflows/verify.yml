@@ -1,5 +1,13 @@
-name: Verify
-on: [push, pull_request]
+name: CI/CD PhoneSale
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: phonesale-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -45,3 +53,75 @@ jobs:
           name: frontend-coverage
           path: web/coverage/phone-sale
           if-no-files-found: ignore
+
+  build:
+    needs: verify
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [api, web]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Image name
+        id: image
+        env:
+          REPOSITORY: ${{ github.repository }}
+        run: echo "name=ghcr.io/${REPOSITORY,,}-${{ matrix.service }}" >> "$GITHUB_OUTPUT"
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.service }}
+          file: ./${{ matrix.service }}/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.image.outputs.name }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_HOST_KEY: ${{ secrets.SERVER_HOST_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$SERVER_HOST_KEY" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+      - name: Deploy immutable release
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY_USER: ${{ github.actor }}
+          REPOSITORY: ${{ github.repository }}
+          RELEASE: ${{ github.sha }}
+        run: |
+          [[ $SERVER_IP =~ ^[a-zA-Z0-9.-]+$ ]] || { echo 'Invalid SERVER_IP'; exit 1; }
+          prefix="ghcr.io/${REPOSITORY,,}"
+          ssh -o BatchMode=yes "root@$SERVER_IP" 'mkdir -p /opt/phone-sale/deploy /opt/phone-sale/.docker; chmod 700 /opt/phone-sale/.docker'
+          scp docker-compose.prod.yml "root@$SERVER_IP:/opt/phone-sale/"
+          scp deploy/deploy.sh deploy/backup.sh deploy/smoke.cjs "root@$SERVER_IP:/opt/phone-sale/deploy/"
+          printf '%s' "$REGISTRY_TOKEN" | ssh "root@$SERVER_IP" "DOCKER_CONFIG=/opt/phone-sale/.docker docker login ghcr.io -u '$REGISTRY_USER' --password-stdin"
+          trap 'ssh "root@$SERVER_IP" "DOCKER_CONFIG=/opt/phone-sale/.docker docker logout ghcr.io" || true' EXIT
+          ssh "root@$SERVER_IP" "IMAGE_PREFIX='$prefix' bash /opt/phone-sale/deploy/deploy.sh '$RELEASE' --registry-images"
+          ssh "root@$SERVER_IP" 'cd /opt/phone-sale && docker compose -p phonesale -f docker-compose.prod.yml exec -T api node deploy-smoke.cjs https://phonesale.mpsistemas.ar'

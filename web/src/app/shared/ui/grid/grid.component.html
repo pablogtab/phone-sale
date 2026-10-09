@@ -16,8 +16,8 @@
                                 />
                             } @else {
                                 <div
-                                    class="w-12 h-12 bg-background-3 rounded-md"
-                                ></div>
+                                    class="w-12 h-12 bg-background-3 rounded-md flex items-center justify-center"
+                                ><icon name="box" size="22" /></div>
                             }
                         }
                         {{ column.get(element) | gridPipe: column.pipe }}
@@ -76,8 +76,8 @@
                             />
                         } @else {
                             <div
-                                class="w-12 h-12 bg-background-3 rounded-md"
-                            ></div>
+                                class="w-12 h-12 bg-background-3 rounded-md flex items-center justify-center"
+                            ><icon name="box" size="22" /></div>
                         }
                     }
                     <span>{{

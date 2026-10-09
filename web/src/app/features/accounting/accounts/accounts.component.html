@@ -1,7 +1,12 @@
 <section class="p-3 flex flex-col gap-4">
-    <p class="feature-description">Cuentas, movimientos y saldos conectados.</p>
 
-    <h2>{{ data.title }}</h2>
+    <div class="flex items-center justify-between gap-4">
+        <h1>{{ data.title }}</h1>
+        @if (canCreate && (currentRole.currentRole$ | async)?.role === 'admin') {
+            <button type="button" class="raised primary" (click)="createAccount()"><icon name="add-circle" size="18" />{{ createLabel }}</button>
+        }
+    </div>
+    <p class="feature-description">Cuentas, movimientos y saldos conectados.</p>
     <div class="flex flex-col gap-2">
         @for (entity of entities; track $index) {
             <div

@@ -523,3 +523,9 @@ button.raised.primary icon { color: white; } button.raised.primary icon i { colo
 .workspace > router-outlet + app-edit-order {
     max-width: none;
 }
+
+/* Keep dialog scrollbars and sticky footers inside the rounded surface. */
+@media (min-width: 768px) {
+    .dialog-panel { clip-path: inset(0 round 24px); }
+    .dialog-panel::-webkit-scrollbar-track { margin-block: 20px; }
+}

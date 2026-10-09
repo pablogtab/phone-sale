@@ -1,4 +1,8 @@
+export interface EquipmentGrading { id: number; code: string; description: string; index: number; }
+
 export interface Device {
+    gradingId?: number | null;
+    equipmentGrading?: EquipmentGrading;
     id: number;
     publicId: string;
     description: string;

@@ -8,6 +8,7 @@ import { OrdersService } from '../modules/orders/orders.service';
 import { AccountingAccountTransactionsService } from '../modules/accounting-accounts/accounting-accounts-transactions.service';
 import { EventService } from '../modules/events/event.service';
 import { DeviceService } from '../modules/devices/services/device.service';
+import { seedDemoDashboard } from './seed-demo-dashboard';
 import { UserToken } from '../auth/dto/token-info.dto';
 
 /** Fictional demo operations use the same services and accounting rules as the UI. */
@@ -20,8 +21,10 @@ export async function seedDemo(
   const db = app.get(DatabaseService);
   return db.transaction(async () => {
     await db.parameter.query('SELECT pg_advisory_xact_lock(73420911)');
-    if (await db.parameter.findOneBy({ key: 'seed_demo_v1' }))
-      return { created: false };
+    if (await db.parameter.findOneBy({ key: 'seed_demo_v1' })) {
+      const dashboard = await seedDemoDashboard(app, options);
+      return { created: false, dashboard };
+    }
     const { user, ids } = await seedStarter(db, options);
     if (user.role !== 'admin')
       throw new Error('Demo seed requires an administrator');
@@ -118,6 +121,7 @@ export async function seedDemo(
         order: { index: 'ASC' },
       })
     ).filter((model) => catalogNames.has(model.name));
+    const gradings = await db.equipmentGrading.find({ order: { index: "ASC" } });
     const devices = [];
     for (const [index, model] of models.entries()) {
       const color = model.availableColors[0];
@@ -203,6 +207,7 @@ export async function seedDemo(
         storageSizeId: storage.id,
         colorId: color.id,
         condition: index % 3 === 0 ? 'used' : 'sealed',
+        gradingId: index % 3 === 0 ? gradings[Math.floor(index / 3) % gradings.length].id : null,
         hasProblem: false,
         oficialWarranty: false,
         originProviderId: providerId,
@@ -309,12 +314,14 @@ export async function seedDemo(
         }),
       }),
     );
+    const dashboard = await seedDemoDashboard(app, options);
     return {
       created: true,
       clients: clients.length,
       accessories: accessories.length,
-      devices: devices.length,
-      orders: 6,
+      devices: devices.length + dashboard.devices,
+      orders: 6 + dashboard.orders,
+      dashboard,
     };
   });
 }

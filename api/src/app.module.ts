@@ -2,6 +2,7 @@ import { AuthModule } from '@/auth/auth.module';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { StoreSettingsModule } from './modules/store-settings/store-settings.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 import { AccountingAccountsModule } from './modules/accounting-accounts/accounting-accounts.module';
@@ -23,6 +24,7 @@ import { UsersModule } from './modules/users/users.module';
 @Module({
   imports: [
     StoreSettingsModule,
+    DashboardModule,
     EventEmitterModule.forRoot(),
     AuthModule,
     UsersModule,

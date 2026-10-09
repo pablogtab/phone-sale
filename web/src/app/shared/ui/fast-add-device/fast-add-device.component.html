@@ -59,6 +59,19 @@
         }
     </div>
 
+    @if (!form.controls.sealed.value) {
+        <div>
+            <label for="trade-in-grading">Calificación del equipo usado</label>
+            @if (gradingError) {
+                <button type="button" class="stroked primary" (click)="loadGradings()">Reintentar calificaciones</button>
+            } @else {
+                <select id="trade-in-grading" formControlName="gradingId">
+                    <option [ngValue]="null">Sin calificar</option>
+                    @for (grading of gradings; track grading.id) { <option [ngValue]="grading.id">{{ grading.description }}</option> }
+                </select>
+            }
+        </div>
+    }
     <div class="flex flex-row items-center gap-4 justify-between">
         <span class="text-lg font-medium">Tiene problema/s?</span>
         <toggle formControlName="hasProblem"></toggle>

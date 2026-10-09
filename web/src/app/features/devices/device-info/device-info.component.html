@@ -157,7 +157,8 @@
                         </dd>
                     </div>
                 }
-            </dl>
+            @if (device.condition === 'used') { <div><dt>Calificación</dt><dd>{{ device.equipmentGrading?.description || 'Sin calificar' }}</dd></div> }
+</dl>
         </section>
         @if (device.publicComments) {
             <section class="detail-card comments">

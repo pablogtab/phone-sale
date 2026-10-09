@@ -21,6 +21,8 @@ import { DeviceHistory } from '../models/device-history';
 })
 export class DeviceService {
     baseUrl: string = environment.baseUrl;
+
+    getGradings() { return this.http.get<import("../models/device").EquipmentGrading[]>(this.baseUrl + "equipment-grading"); }
     constructor(private readonly http: HttpClient) {}
 
     get(id: number): Observable<DetailedDevice> {
@@ -207,6 +209,7 @@ export interface CreateDeviceDto {
     originProviderId?: number;
     purchasePrice?: number;
     hasBeenTested?: boolean;
+    gradingId?: number | null;
     depreciation?: number;
     technicalServiceProviderId?: number;
     technicalServiceDate?: Date;

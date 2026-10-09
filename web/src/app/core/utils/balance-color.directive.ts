@@ -25,7 +25,7 @@ export class BalanceColorDirective implements OnChanges {
     private updateTextColor(): void {
         let color = '';
         color =
-            this.value > 0 ? '#33FF33' : this.value < 0 ? '#FF3333' : 'white';
+            this.value > 0 ? '#3c7046' : this.value < 0 ? '#b4483b' : 'var(--contrast-1)';
         this.renderer.setStyle(this.el.nativeElement, 'color', color);
     }
 }

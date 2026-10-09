@@ -74,6 +74,21 @@ describe('inventory workflows', () => {
         request.flush(device);
         expect(t.ref.close).toHaveBeenCalledWith(device);
     });
+    it('shows editable used grading, submits it and clears it for sealed devices', async () => {
+        const t = await newDevice();
+        t.component.form.controls.sealed.setValue(false);
+        await t.render();
+        expect(t.fixture.nativeElement.textContent).toContain('Calificación del equipo usado');
+        const input = t.fixture.nativeElement.querySelector('.grading-options input') as HTMLInputElement;
+        input.click();
+        expect(t.component.form.controls.gradingId.value).toBe(1);
+        t.messages.question.mockResolvedValue(true);
+        await t.component.save();
+        const r = t.http.expectOne('/api/devices/devices/');
+        expect(r.request.body.get('gradingId')).toBe('1'); r.flush(device);
+        t.component.form.controls.sealed.setValue(true);
+        expect(t.component.deviceValues.gradingId).toBeNull();
+    });
     it('cancelling creation does not write or discard the selected model', async () => {
         const t = await newDevice();
         await t.component.save();

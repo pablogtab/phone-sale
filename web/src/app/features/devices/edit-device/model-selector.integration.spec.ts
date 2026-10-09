@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { By } from '@angular/platform-browser';
 import { AutoComplete } from '@openng/optimus-ui/autocomplete';
 import { Component, inject, getDebugNode, DebugElement } from '@angular/core';
@@ -69,16 +70,15 @@ describe('model selector inside the actual new-device dialog', () => {
         fixture.autoDetectChanges();
         fixture.nativeElement.querySelector('button').click();
         await fixture.whenStable();
+        http.expectOne('/api/equipment-grading').flush([]);
+        await fixture.whenStable();
         const input = document.body.querySelector(
             'device-model-search input',
         ) as HTMLInputElement;
         input.focus();
         input.value = 'ipho';
         input.dispatchEvent(new Event('input', { bubbles: true }));
-        await new Promise((resolve) => setTimeout(resolve, 210));
-        http.expectOne(
-            '/api/devices/models/search?query=ipho&active=true',
-        ).flush([model, { ...model, id: 2, name: 'iPhone 8 Plus' }]);
+        (await vi.waitFor(() => http.expectOne('/api/devices/models/search?query=ipho&active=true'))).flush([model, { ...model, id: 2, name: 'iPhone 8 Plus' }]);
         await fixture.whenStable();
         const option = [
             ...document.body.querySelectorAll('[role="option"]'),
@@ -112,26 +112,22 @@ describe('model selector inside the actual new-device dialog', () => {
         fixture.autoDetectChanges();
         fixture.nativeElement.querySelector('button').click();
         await fixture.whenStable();
+        http.expectOne('/api/equipment-grading').flush([]);
+        await fixture.whenStable();
         const input = document.body.querySelector(
             'device-model-search input',
         ) as HTMLInputElement;
         input.focus();
         input.value = 'ipho';
         input.dispatchEvent(new Event('input', { bubbles: true }));
-        await new Promise((resolve) => setTimeout(resolve, 210));
-        http.expectOne(
-            '/api/devices/models/search?query=ipho&active=true',
-        ).flush({}, { status: 503, statusText: 'Unavailable' });
+        (await vi.waitFor(() => http.expectOne('/api/devices/models/search?query=ipho&active=true'))).flush({}, { status: 503, statusText: 'Unavailable' });
         await fixture.whenStable();
         expect(document.body.textContent).toContain(
             'No pudimos cargar las opciones',
         );
         input.value = 'iphone';
         input.dispatchEvent(new Event('input', { bubbles: true }));
-        await new Promise((resolve) => setTimeout(resolve, 210));
-        http.expectOne(
-            '/api/devices/models/search?query=iphone&active=true',
-        ).flush([model]);
+        (await vi.waitFor(() => http.expectOne('/api/devices/models/search?query=iphone&active=true'))).flush([model]);
         await fixture.whenStable();
         expect(
             document.body.querySelector('[role="option"]').textContent,

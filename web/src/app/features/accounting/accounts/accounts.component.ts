@@ -1,3 +1,5 @@
+import { CurrentRoleService } from '@/app/core/auth/current-role.service';
+import { CreateAccountComponent, ACCOUNT_CREATION } from './create-account.component';
 import {
     ChangeDetectorRef as ViewChangeDetector,
     DestroyRef as ViewLifetime,
@@ -35,6 +37,14 @@ export class AccountsComponent {
     accountingService = inject(AccountingService);
     dialog = inject(Dialog);
 
+    currentRole = inject(CurrentRoleService);
+    get canCreate() { return this.data.type in ACCOUNT_CREATION; }
+    get createLabel() { return this.data.type === 'bank' ? 'Nueva cuenta' : this.data.type === 'cash_account' ? 'Nueva caja' : 'Nuevo proveedor'; }
+    createAccount() {
+        if (!this.canCreate) return;
+        this.dialog.open(CreateAccountComponent, { data: this.data.type }).closed
+            .pipe(refreshView(this.viewChangeDetector, this.viewLifetime)).subscribe(created => { if (created) this.loadData(); });
+    }
     data: AccountUrlQueryParams = {} as AccountUrlQueryParams;
 
     entities: IEntities[] = [];

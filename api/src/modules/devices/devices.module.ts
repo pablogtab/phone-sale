@@ -1,3 +1,4 @@
+import { EquipmentGradingController } from './controllers/equipment-grading.controller';
 import { Module } from '@nestjs/common';
 import { ProvidersModule } from '../providers/providers.module';
 
@@ -18,6 +19,7 @@ import { AccountingAccountsModule } from '../accounting-accounts/accounting-acco
 @Module({
   exports: [DeviceService, DevicePriceReferenceService],
   controllers: [
+    EquipmentGradingController,
     DeviceController,
     DeviceModelController,
     DeviceColorController,

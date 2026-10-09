@@ -14,3 +14,7 @@ compose.override.yaml
 uploads/
 *.tsbuildinfo
 out-tsc/
+backups/
+.deploy.lock
+.backup.lock
+.deployed-tag

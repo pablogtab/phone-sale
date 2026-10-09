@@ -46,6 +46,7 @@ export class DeviceService {
     const device = await this.database.device.findOne({
       where: { id, deletedAt: IsNull() },
       relations: {
+        equipmentGrading: true,
         color: true,
         model: true,
         storageSize: true,
@@ -85,6 +86,9 @@ export class DeviceService {
 
   @Transactional()
   async create(dto: CreateDeviceServiceDto) {
+    if (dto.gradingId != null && !(await this.database.equipmentGrading.findOneBy({ id: dto.gradingId }))) {
+      throw new BadRequestException('Calificación de equipo inválida');
+    }
     const condition: DeviceCondition = dto.condition;
     const status: DeviceStatus = dto.status || 'available';
 
@@ -113,6 +117,7 @@ export class DeviceService {
         warrantyExpiresAt: dto.warrantyExpiresAt,
         originProviderId: dto.originProviderId,
         purchasePrice: dto.purchasePrice,
+        gradingId: condition === "used" ? dto.gradingId ?? null : null,
         depreciation: dto.depreciation,
       }),
     );
@@ -272,6 +277,9 @@ export class DeviceService {
       throw new NotFoundException('Device not found');
     }
 
+    if (dto.gradingId != null && !(await this.database.equipmentGrading.findOneBy({ id: dto.gradingId }))) {
+      throw new BadRequestException('Calificación de equipo inválida');
+    }
     const condition: DeviceCondition = dto.condition;
 
     const description = await this.getDescription({
@@ -300,6 +308,7 @@ export class DeviceService {
         warrantyExpiresAt: dto.warrantyExpiresAt,
         originProviderId: dto.originProviderId,
         purchasePrice: dto.purchasePrice,
+        gradingId: condition === "used" ? dto.gradingId ?? null : null,
         depreciation: dto.depreciation,
       },
     );

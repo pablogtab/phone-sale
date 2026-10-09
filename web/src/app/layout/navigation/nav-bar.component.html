@@ -29,7 +29,7 @@
     <nav aria-label="Navegación principal">
         @for (item of menuOptions; track item.label) {
             @if (item.items) {
-                <details class="nav-group">
+                <details class="nav-group" name="navigation-groups">
                     <summary>
                         <icon [name]="item.icon" /><span>{{ item.label }}</span
                         ><i class="pi pi-angle-down" aria-hidden="true"></i>

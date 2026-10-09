@@ -1,0 +1,66 @@
+name: phonesale
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-phone_sale_app}
+      POSTGRES_USER: ${DATABASE_USER:-phone_sale}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Set DATABASE_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [app]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  api:
+    image: ${IMAGE_PREFIX:-phonesale}-api:${IMAGE_TAG:?Set IMAGE_TAG}
+    build: ./api
+    restart: unless-stopped
+    env_file: ${ENV_FILE:-.env}
+    environment:
+      NODE_ENV: production
+      PORT: 3210
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_SCHEMA: public
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+    volumes:
+      - uploads:/app/uploads
+      - ./deploy/smoke.cjs:/app/deploy-smoke.cjs:ro
+    networks: [app]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3210/api/store-settings', {signal: AbortSignal.timeout(5000)}).then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 10s
+      start_period: 60s
+      retries: 12
+  web:
+    image: ${IMAGE_PREFIX:-phonesale}-web:${IMAGE_TAG:?Set IMAGE_TAG}
+    build: ./web
+    restart: unless-stopped
+    networks:
+      app:
+      proxy:
+        aliases: [phonesale_frontend]
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, wget, -q, --spider, http://127.0.0.1/]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+networks:
+  app:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:-axenda-network}
+volumes:
+  postgres_data:
+  uploads:

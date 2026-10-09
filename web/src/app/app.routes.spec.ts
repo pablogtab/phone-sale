@@ -23,7 +23,8 @@ const cashQuery = btoa(
     }),
 );
 const cases = [
-    ['/', 'iPhone 8'],
+    ['/', 'Resumen'],
+    ['/dashboard', 'Ventas completadas'],
     ['/devices', 'iPhone 8'],
     ['/clients', 'Ana Demo'],
     ['/clients/customer-1', 'Ana Demo'],
@@ -35,7 +36,7 @@ const cases = [
     ['/settings/store', 'Tu tienda'],
     ['/settings/device-models', 'iPhone 8'],
     ['/settings/prices', 'iPhone 8'],
-    ['/settings/models/adjustment', 'Iphone 8'],
+    ['/settings/models/adjustment', 'iPhone 8'],
     ['/settings/products', 'Cable Demo'],
     ['/users', 'Admin'],
     ['/profile', 'Admin'],
@@ -78,7 +79,7 @@ describe('all routed frontend screens', () => {
             await harness.fixture.whenStable();
             expect(harness.routeNativeElement?.textContent).toContain(content);
             if (path === '/')
-                expect(TestBed.inject(Router).url).toBe('/devices');
+                expect(TestBed.inject(Router).url).toBe('/dashboard');
         });
     }
     it('redirects protected screens without a session to the actual login form', async () => {

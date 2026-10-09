@@ -51,12 +51,14 @@ export class ModelAdjustmentComponent implements OnInit {
     deviceModelWithAdjustments$: Observable<DeviceModelWithAdjustments[]> =
         this.deviceModelWithAdjustmentsSubject.asObservable();
 
+    readonly typeLabels: Record<string, string> = { depreciation: 'Depreciación', appreciation: 'Apreciación' };
+    readonly categoryLabels: Record<string, string> = { battery: 'Batería', warranty: 'Garantía', box: 'Caja' };
     types = Object.entries(ADJUSTMENT_TYPES).map(([key, value]) => ({
-        label: value,
+        label: this.typeLabels[key],
         value: key,
     }));
     categories = Object.entries(ADJUSTMENT_CATEGORIES).map(([key, value]) => ({
-        label: value,
+        label: this.categoryLabels[key],
         value: key,
     }));
     loading: boolean = true;

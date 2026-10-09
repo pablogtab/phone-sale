@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { AsyncLocalStorage } from 'async_hooks';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import {
+  EquipmentGrading,
   AccountingAccount,
   AccountingTransaction,
   Bank,
@@ -50,6 +51,7 @@ export class Repositories {
   get client(): Repository<Client> {
     return this.manager.getRepository<Client>('Client');
   }
+  get equipmentGrading(): Repository<EquipmentGrading> { return this.manager.getRepository<EquipmentGrading>("EquipmentGrading"); }
   get deviceHistory(): Repository<DeviceHistory> {
     return this.manager.getRepository<DeviceHistory>('DeviceHistory');
   }

@@ -4,6 +4,7 @@ import { isAuthenticated } from './core/auth/is-authenticated';
 import { HasPermissionGuard } from './core/auth/has-permission.guard';
 import { PERMISSIONS, PERMISSION_ACTIONS } from './core/permissions';
 import { SetRoleGuard } from './core/auth/set-role.guard';
+import { dashboardGuard } from './core/auth/dashboard.guard';
 
 export const routes: Routes = [
     {
@@ -19,11 +20,12 @@ export const routes: Routes = [
             import('./layout/shell.component').then((m) => m.ShellComponent),
         canActivate: [isAuthenticated, SetRoleGuard],
         children: [
+            { path: 'dashboard', canActivate: [dashboardGuard], loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
             { path: 'settings/store', loadComponent: () => import('./features/settings/store/store.component').then(m => m.StoreComponent) },
             {
                 path: '',
                 pathMatch: 'full',
-                redirectTo: 'devices',
+                redirectTo: 'dashboard',
             },
             {
                 path: 'profile',

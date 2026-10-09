@@ -47,13 +47,13 @@
         />
     } @else {
         <div class="inventory-count">
-            {{ totalDevices }} equipos en esta vista
+            {{ totalDevices }} {{ totalDevices === 1 ? 'equipo' : 'equipos' }} en esta vista
         </div>
         @for (model of models; track model.id) {
             @if (model.devices.length) {
                 <div class="model-heading">
                     <h2>{{ model.name }}</h2>
-                    <span>{{ model.devices.length }} equipos</span>
+                    <span>{{ model.devices.length }} {{ model.devices.length === 1 ? 'equipo' : 'equipos' }}</span>
                 </div>
                 <div class="device-list">
                     @for (device of model.devices; track device.id) {

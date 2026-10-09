@@ -9,7 +9,7 @@ import { DeviceModel } from '@/app/core/models/device-model';
 import { DeviceStorageSize } from '@/app/core/models/device-storage-size';
 import { Provider } from '@/app/core/models/provider';
 import { DeviceModelService } from '@/app/core/api/device-model.service';
-import { CreateDeviceDto } from '@/app/core/api/device.service';
+import { DeviceService, CreateDeviceDto } from '@/app/core/api/device.service';
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -33,6 +33,7 @@ export class FastAddDeviceComponent {
     form = new FormGroup({
         model: new FormControl<DeviceModel>(null),
         sealed: new FormControl(false),
+        gradingId: new FormControl<number | null>(null),
         batteryHealth: new FormControl(null, [
             Validators.min(0),
             Validators.max(100),
@@ -56,7 +57,15 @@ export class FastAddDeviceComponent {
         hasBeenTested: new FormControl(false),
     });
 
+    gradings: import('@/app/core/models/device').EquipmentGrading[] = [];
+    gradingError = false;
+    private deviceService = inject(DeviceService);
+    loadGradings() {
+        this.gradingError = false;
+        this.deviceService.getGradings().pipe(refreshView(this.viewChangeDetector, this.viewLifetime)).subscribe({ next: data => this.gradings = data, error: () => this.gradingError = true });
+    }
     ngOnInit(): void {
+        this.loadGradings();
         this.form.controls.model.valueChanges
             .pipe(refreshView(this.viewChangeDetector, this.viewLifetime))
             .subscribe((model) => {
@@ -139,6 +148,7 @@ export class FastAddDeviceComponent {
             modelId: this.form.controls.model.value.id,
             storageSizeId: this.form.controls.storageSizeId.value,
             condition: this.form.controls.sealed.value ? 'sealed' : 'used',
+            gradingId: this.form.controls.sealed.value ? null : this.form.controls.gradingId.value,
             batteryHealth: this.form.controls.batteryHealth.value,
             batteryCicleCount: this.form.controls.batteryCicleCount.value,
             oficialWarranty: this.form.controls.oficialWarranty.value,

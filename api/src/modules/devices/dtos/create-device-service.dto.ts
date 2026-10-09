@@ -4,6 +4,8 @@ import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsIn,
+  IsInt,
+  Min,
   IsNumber,
   IsOptional,
   IsString,
@@ -12,6 +14,11 @@ import {
 } from 'class-validator';
 
 export class CreateDeviceServiceDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  gradingId?: number | null;
+
   @IsString()
   @IsIn(Object.keys(DEVICE_CONDITIONS))
   condition: DeviceCondition;
