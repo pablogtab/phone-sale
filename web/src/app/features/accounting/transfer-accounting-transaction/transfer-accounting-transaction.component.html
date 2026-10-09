@@ -1,0 +1,211 @@
+<dialog-header [title]="data.title"></dialog-header>
+<section class="p-4 flex flex-col gap-4">
+    <ng-container *ngTemplateOutlet="templateA"></ng-container>
+    <div class="self-center">
+        <icon name="arrow-down"></icon>
+    </div>
+    <ng-container *ngTemplateOutlet="templateB"></ng-container>
+
+    <div class="border-b-[1px] border-background-4"></div>
+    <div>
+        <span>Cotizacion</span>
+        <p-inputnumber
+            fluid
+            [formControl]="exchangeRate"
+            type="exchangeRate"
+            prefix="$ "
+        />
+    </div>
+    <div>
+        <span>Monto</span>
+        <div class="flex flex-row gap-4">
+            <!-- Tuve que dejarlo en en-US porque la libreria falla al setearle el valor (primeNG) -->
+            <p-inputnumber
+                (onFocus)="onFocus($event)"
+                fluid
+                mode="decimal"
+                locale="en-US"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                [formControl]="amountARS"
+                prefix="ARS $ "
+            />
+            <p-inputnumber
+                (onFocus)="onFocus($event)"
+                fluid
+                mode="decimal"
+                locale="en-US"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                [formControl]="amountUSD"
+                prefix="USD $ "
+            />
+        </div>
+    </div>
+
+    <button [disabled]="!isValid" class="raised primary" (click)="save()">
+        Guardar
+    </button>
+</section>
+
+<ng-template #templateA>
+    <form [formGroup]="formA" class="flex flex-col gap-4">
+        <div [hidden]="formA.controls.transferAccountType.disabled">
+            <span>Tipo de cuenta</span>
+            <p-autocomplete
+                fluid
+                completeOnFocus
+                showClear
+                dropdown
+                formControlName="transferAccountType"
+                (completeMethod)="searchAccountTypes($event)"
+                [suggestions]="suggestions"
+                optionLabel="label"
+                optionValue="value"
+            >
+            </p-autocomplete>
+        </div>
+        <div
+            class="flex flex-row gap-4"
+            [hidden]="!formA.controls.transferAccountType.value"
+        >
+            <div class="flex flex-1 flex-col self-end">
+                <span [hidden]="!formA.controls.transferAccountType.disabled">{{
+                    formATypeLabel
+                }}</span>
+                <client-search
+                    [hidden]="
+                        formA.controls.transferAccountType.value !== 'client'
+                    "
+                    formControlName="client"
+                    #formAClientSearch
+                ></client-search>
+                <user-search
+                    [hidden]="
+                        formA.controls.transferAccountType.value !== 'user'
+                    "
+                    formControlName="user"
+                    #formAUserSearch
+                ></user-search>
+                <provider-search
+                    [hidden]="
+                        formA.controls.transferAccountType.value !== 'provider'
+                    "
+                    formControlName="provider"
+                    #formAProviderSearch
+                ></provider-search>
+                <bank-search
+                    [hidden]="
+                        formA.controls.transferAccountType.value !== 'bank'
+                    "
+                    formControlName="bank"
+                    #formABankSearch
+                ></bank-search>
+                <cash-accounts-search
+                    [hidden]="
+                        formA.controls.transferAccountType.value !==
+                        'cash_account'
+                    "
+                    formControlName="cash_account"
+                    #formACashAccountSearch
+                ></cash-accounts-search>
+            </div>
+            <div class="flex flex-col">
+                <span>Moneda</span>
+                <!-- <selectable [config]="selectableCurrencyConfig" [value]="form.controls.currency">
+                @for(option of currencies; track $index) {
+                <selectable-option [value]="option"></selectable-option>
+                }
+            </selectable> -->
+                <p-selectbutton
+                    allowEmpty="false"
+                    [options]="currencies"
+                    formControlName="currency"
+                    optionLabel="label"
+                    optionValue="currency"
+                />
+            </div>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #templateB>
+    <form [formGroup]="formB" class="flex flex-col gap-4">
+        <div [hidden]="formB.controls.transferAccountType.disabled">
+            <span>Tipo de cuenta</span>
+            <p-autocomplete
+                fluid
+                completeOnFocus
+                showClear
+                dropdown
+                formControlName="transferAccountType"
+                (completeMethod)="searchAccountTypes($event)"
+                [suggestions]="suggestions"
+                optionLabel="label"
+                optionValue="value"
+            >
+            </p-autocomplete>
+        </div>
+        <div
+            class="flex flex-row gap-4"
+            [hidden]="!formB.controls.transferAccountType.value"
+        >
+            <div class="flex flex-1 flex-col self-end">
+                <span [hidden]="!formB.controls.transferAccountType.disabled">{{
+                    formBTypeLabel
+                }}</span>
+                <client-search
+                    [hidden]="
+                        formB.controls.transferAccountType.value !== 'client'
+                    "
+                    formControlName="client"
+                    #formBClientSearch
+                ></client-search>
+                <user-search
+                    [hidden]="
+                        formB.controls.transferAccountType.value !== 'user'
+                    "
+                    formControlName="user"
+                    #formBUserSearch
+                ></user-search>
+                <provider-search
+                    [hidden]="
+                        formB.controls.transferAccountType.value !== 'provider'
+                    "
+                    formControlName="provider"
+                    #formBProviderSearch
+                ></provider-search>
+                <bank-search
+                    [hidden]="
+                        formB.controls.transferAccountType.value !== 'bank'
+                    "
+                    formControlName="bank"
+                    #formBBankSearch
+                ></bank-search>
+                <cash-accounts-search
+                    [hidden]="
+                        formB.controls.transferAccountType.value !==
+                        'cash_account'
+                    "
+                    formControlName="cash_account"
+                    #formBCashAccountSearch
+                ></cash-accounts-search>
+            </div>
+            <div class="flex flex-col">
+                <span>Moneda</span>
+                <!-- <selectable [config]="selectableCurrencyConfig" [value]="form.controls.currency">
+                @for(option of currencies; track $index) {
+                <selectable-option [value]="option"></selectable-option>
+                }
+            </selectable> -->
+                <p-selectbutton
+                    allowEmpty="false"
+                    [options]="currencies"
+                    formControlName="currency"
+                    optionLabel="label"
+                    optionValue="currency"
+                />
+            </div>
+        </div>
+    </form>
+</ng-template>

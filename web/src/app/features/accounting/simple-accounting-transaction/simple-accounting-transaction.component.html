@@ -1,0 +1,106 @@
+<dialog-header title="Movimiento"></dialog-header>
+
+<div class="p-4 flex flex-col gap-4">
+    <div class="flex flex-row gap-4">
+        <span>Tipo de cuenta:</span>
+        <span> {{ accountTypeLabel }} </span>
+    </div>
+    <div [hidden]="!(form.controls.selectedAccountType.value === 'provider')">
+        <span>Proveedor</span>
+        <provider-search
+            [formControl]="form.controls.provider"
+        ></provider-search>
+    </div>
+    <div [hidden]="!(form.controls.selectedAccountType.value === 'client')">
+        <span>Cliente</span>
+        <client-search [formControl]="form.controls.client"></client-search>
+    </div>
+    <div [hidden]="!(form.controls.selectedAccountType.value === 'bank')">
+        <span>Banco</span>
+        <bank-search [formControl]="form.controls.bank"></bank-search>
+    </div>
+    <div [hidden]="!(form.controls.selectedAccountType.value === 'user')">
+        <span>Usuario</span>
+        <user-search [formControl]="form.controls.user"></user-search>
+    </div>
+    <div
+        [hidden]="!(form.controls.selectedAccountType.value === 'cash_account')"
+    >
+        <span>Caja</span>
+        <cash-accounts-search
+            [formControl]="form.controls.cashAccount"
+        ></cash-accounts-search>
+    </div>
+    <div class="flex flex-row gap-4">
+        <div class="flex-[3] flex flex-col">
+            <span>Monto</span>
+            <p-inputnumber
+                [formControl]="form.controls.amount"
+                type="currency"
+                prefix="$ "
+                [min]="0.01"
+            />
+        </div>
+        <div class="flex-[2] md:flex-1">
+            <span>Moneda</span>
+            <!-- <selectable [config]="selectableCurrencyConfig" [value]="form.controls.currency">
+                @for(option of currencies; track $index) {
+                <selectable-option [value]="option"></selectable-option>
+                }
+            </selectable> -->
+            <p-selectbutton
+                allowEmpty="false"
+                [options]="currencies"
+                [formControl]="form.controls.currency"
+                optionLabel="label"
+                optionValue="currency"
+            />
+        </div>
+    </div>
+    <div>
+        <span>Detalles</span>
+        <textarea [formControl]="form.controls.details"></textarea>
+    </div>
+    <div>
+        <span>Seleccione</span>
+        <div class="flex flex-row gap-4">
+            <button
+                class="flex-1 stroked"
+                [class.warn]="isAsset"
+                [class.primary]="!isAsset"
+                [class.stroked]="
+                    form.controls.transactionSelected.value !== 'debit'
+                "
+                [class.raised]="
+                    form.controls.transactionSelected.value === 'debit'
+                "
+                (click)="form.controls.transactionSelected.setValue('debit')"
+            >
+                {{ buttonDebit }}
+            </button>
+            <button
+                class="flex-1"
+                [class.warn]="!isAsset"
+                [class.primary]="isAsset"
+                [class.stroked]="
+                    form.controls.transactionSelected.value !== 'credit'
+                "
+                [class.raised]="
+                    form.controls.transactionSelected.value === 'credit'
+                "
+                (click)="form.controls.transactionSelected.setValue('credit')"
+            >
+                {{ buttonCredit }}
+            </button>
+        </div>
+    </div>
+    <div class="flex-1 flex flex-col mt-4">
+        <button
+            [disabled]="!validForm"
+            class="raised tertiary"
+            (click)="save()"
+        >
+            Guardar
+        </button>
+    </div>
+</div>

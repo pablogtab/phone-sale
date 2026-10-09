@@ -1,0 +1,19 @@
+.chip.selected {
+    @apply bg-primary;
+
+    &.disabled {
+        @apply bg-background-4;
+    }
+}
+
+.chip {
+    @apply py-2 px-4 rounded-full cursor-pointer border border-primary min-w-[60px] text-center;
+
+    &.disabled {
+        @apply border-background-4 cursor-auto;
+    }
+}
+
+.chip-set {
+    @apply flex flex-wrap gap-2;
+}

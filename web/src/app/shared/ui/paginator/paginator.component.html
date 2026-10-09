@@ -1,0 +1,31 @@
+@if (totalPages > 1) {
+    <div
+        class="flex flex-row justify-center gap-1 items-center touch-manipulation select-none"
+    >
+        <button
+            class="rounded raised gray size-9 flex items-center justify-center border-background-3 border-2"
+            (click)="prevPage()"
+        >
+            <icon name="chevron-left"></icon>
+        </button>
+        @for (item of renderBoxes; track $index) {
+            <button
+                class="rounded raised size-9 flex items-center justify-center"
+                (click)="goToPage(item.number)"
+                [class.hover:bg-background-2]="!item.period"
+                [class.tertiary]="item.number === page"
+            >
+                {{ item.number }}
+                @if (item.period) {
+                    <span class="text-med">...</span>
+                }
+            </button>
+        }
+        <button
+            class="rounded relative raised gray size-9 flex items-center justify-center border-background-3 border-2"
+            (click)="nextPage()"
+        >
+            <icon name="chevron-right"></icon>
+        </button>
+    </div>
+}

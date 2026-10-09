@@ -1,0 +1,229 @@
+<dialog-header title="Info del Equipo"></dialog-header>
+<section class="p-4 flex flex-col gap-4">
+    @if (device.id) {
+        <div class="flex flex-row gap-4 items-center">
+            @if (device.mainPhotoUrl) {
+                <div class="size-28 rounded-lg overflow-hidden">
+                    <img
+                        [src]="baseFilesUrl + device.mainPhotoUrl"
+                        alt="mainPhoto?.publicId"
+                        class="size-28 object-cover"
+                    />
+                </div>
+            }
+            <div class="flex flex-col flex-1">
+                <p
+                    class="text-sm font-bold"
+                    [class.text-primary-hover]="device.status === 'available'"
+                    [class.text-warn-hover]="device.status === 'reserved'"
+                >
+                    {{ getDeviceStatus(device) | uppercase }}
+                </p>
+                <p class="text-2xl font-bold">
+                    {{ device.model.name }} {{ device.storageSize.size }}
+                    {{ device.color.name }}
+                </p>
+                <span class="text-md font-bold text-text-gray-500">
+                    @if (isSealed) {
+                        Sellado
+                    } @else {
+                        {{ batteryInfo }}
+                    }
+                </span>
+                <div class="flex flex-row gap-2 items-center justify-end">
+                    <button
+                        class="raised primary !py-1 !rounded-full flex flex-row items-center gap-1"
+                    >
+                        <icon name="shopping-cart" size="15"></icon>
+                        <span>Vender</span>
+                    </button>
+                    <button
+                        class="raised gray-3 !py-1 !rounded-full"
+                        [cdkMenuTriggerFor]="menu"
+                    >
+                        <span>Acciones</span>
+                    </button>
+                    <ng-template #menu>
+                        <div class="menu !bg-background-2" cdkMenu>
+                            <button
+                                class="menu-item"
+                                cdkMenuItem
+                                (click)="editDevice()"
+                            >
+                                <span>Editar</span>
+                                <icon
+                                    name="cellphone"
+                                    size="15"
+                                    color="background-4"
+                                ></icon>
+                            </button>
+                            @if (!isSealed && hasBeenTested) {
+                                <button
+                                    class="menu-item"
+                                    cdkMenuItem
+                                    (click)="undoTest()"
+                                >
+                                    <span>Deshacer Testeo</span>
+                                    <icon
+                                        name="cellphone"
+                                        size="15"
+                                        color="background-4"
+                                    ></icon>
+                                </button>
+                                <button
+                                    class="menu-item"
+                                    cdkMenuItem
+                                    (click)="testDevice()"
+                                >
+                                    <span>Re-Testear</span>
+                                    <icon
+                                        name="cellphone"
+                                        size="15"
+                                        color="background-4"
+                                    ></icon>
+                                </button>
+                            }
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+
+        @if (!isSealed) {
+            @if (!hasBeenTested) {
+                <div
+                    class="w-full flex flex-row p-2 justify-between items-center bg-warn bg-opacity-60 rounded-lg"
+                >
+                    <div class="flex flex-row gap-1 items-center">
+                        <icon name="close" color="white"></icon>
+                        <span>FALTA TESTEAR</span>
+                    </div>
+                    <button
+                        class="bg-background-2 px-4 py-1 rounded-full border border-background-4"
+                        (click)="testDevice()"
+                    >
+                        <span class="text-md font-semibold">Testear</span>
+                    </button>
+                </div>
+            } @else {
+                <div
+                    class="w-full flex flex-row p-3 justify-between items-center bg-primary-hover bg-opacity-60 rounded-lg"
+                >
+                    <div class="flex flex-row gap-1 items-center">
+                        <icon name="check" color="white"></icon>
+                        <span>TESTEADO</span>
+                    </div>
+                </div>
+            }
+        }
+
+        <div class="info-container">
+            <h3>Información del Equipo</h3>
+            <div class="flex flex-col full">
+                <div class="info-detail">
+                    <span>Condición</span>
+                    <span>{{ condition }}</span>
+                </div>
+                @if (device.imei) {
+                    <div class="info-detail">
+                        <span>IMEI:</span>
+                        <span>{{ device.imei }}</span>
+                    </div>
+                }
+                @if (device.imei2) {
+                    <div class="info-detail">
+                        <span>IMEI2:</span>
+                        <span>{{ device.imei2 }}</span>
+                    </div>
+                }
+                @if (device.oficialWarranty) {
+                    <div class="info-detail">
+                        <span>Garantía Oficial</span>
+                        <span>{{ device.warrantyExpiresAt }}</span>
+                    </div>
+                }
+                @if (device.testedByUser) {
+                    <div class="info-detail">
+                        <span>Testeado por</span>
+                        <span>{{ device.testedByUser }}</span>
+                    </div>
+                }
+                @if (device.testedAt) {
+                    <div class="info-detail">
+                        <span>Testeado el</span>
+                        <span>{{
+                            device.testedAt | date: "dd MMM YY HH:mm"
+                        }}</span>
+                    </div>
+                }
+                @if (device.originProvider) {
+                    <div class="info-detail">
+                        <span>Proveedor</span>
+                        <span>{{ device.originProvider.name }}</span>
+                    </div>
+                }
+                @if (device.purchasePrice) {
+                    <div class="info-detail">
+                        <span>Precio Compra</span>
+                        <span>{{ device.purchasePrice | currency }}</span>
+                    </div>
+                }
+            </div>
+        </div>
+        @if (device.publicComments) {
+            <div class="info-container !gap-2">
+                <h3>Comentarios Públicos</h3>
+                <p>{{ device.publicComments }}</p>
+            </div>
+        }
+
+        @if (device.internalComments) {
+            <div class="info-container !gap-1">
+                <h3>Comentarios Internos</h3>
+                <p>{{ device.internalComments }}</p>
+            </div>
+        }
+
+        @if (device.technicalServiceHistory) {
+            <h3 class="text-left text-2xl font-semibold">
+                Historial manual del equipo
+            </h3>
+            <p style="white-space: pre-line">
+                {{ device.technicalServiceHistory }}
+            </p>
+        }
+
+        @if (device.deviceHistory) {
+            <h3 class="text-left text-2xl font-semibold mb-4">
+                Historial automático del equipo
+            </h3>
+            <p-timeline [value]="device.deviceHistory" class="w-full">
+                <ng-template #content let-history>
+                    <div class="text-left p-2">
+                        <span class="block text-sm text-gray-500">
+                            {{ history.date | date: "dd/MM/yyyy" }} -
+                            {{ history.user.name | titlecase }}
+                        </span>
+
+                        <div
+                            class="text-md font-medium mt-2"
+                            [ngStyle]="{ 'white-space': 'pre-line' }"
+                        >
+                            <span
+                                *ngIf="history.description.includes('Recibido')"
+                                class="text-green-600"
+                            >
+                            </span>
+                            <span
+                                *ngIf="history.description.includes('Vendido')"
+                                class="text-blue-600"
+                            >
+                            </span>
+                            {{ history.description }}
+                        </div>
+                    </div>
+                </ng-template>
+            </p-timeline>
+        }
+    }
+</section>

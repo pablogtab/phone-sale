@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "127.0.0.1:5441:5432"
+    environment:
+      POSTGRES_DB: phone_sale_app
+      POSTGRES_USER: phone_sale
+      POSTGRES_PASSWORD: phone_sale_local
+    volumes:
+      - phone_sale_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phone_sale -d phone_sale_app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  phone_sale_data:

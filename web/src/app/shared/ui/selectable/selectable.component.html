@@ -1,0 +1,53 @@
+@if (config) {
+    <div class="relative">
+        <input
+            [formControl]="filter"
+            (focus)="onFocus()"
+            (keydown)="onKeyDown($event)"
+        />
+        <button
+            class="absolute top-1/2 right-2 transform -translate-y-1/2 rounded-full p-1"
+            style="transform-origin: center"
+            [class.hover:bg-background-2]="!filter.disabled"
+            [class.opacity-50]="filter.disabled"
+            [disabled]="filter.disabled"
+            (click)="open.set(!open())"
+        >
+            <div [@rotate180deg]="open() ? 'close' : 'open'">
+                <icon name="chevron-up"></icon>
+            </div>
+        </button>
+
+        @if (value.value) {
+            <button
+                class="absolute top-1/2 right-8 transform -translate-y-1/2 rounded-full p-1"
+                style="transform-origin: center"
+                [class.hover:bg-background-2]="!filter.disabled"
+                [class.opacity-50]="filter.disabled"
+                [disabled]="filter.disabled"
+                (click)="clear()"
+            >
+                <icon name="close"></icon>
+            </button>
+        }
+
+        @if (open()) {
+            <div
+                @collapsableOpen
+                class="w-full bg-background-3 border-primary border rounded-lg shadow-lg p-2 flex flex-col absolute top-full left-0 z-10 overflow-y-scroll max-h-52 options"
+                style="transform-origin: top"
+            >
+                @for (item of filteredList; track $index) {
+                    <button
+                        class="text-left p-1 hover:bg-background-2"
+                        (click)="onSelected(item.value)"
+                    >
+                        {{ safeGetLabel(item.value) }}
+                    </button>
+                } @empty {
+                    <div class="text-center">No hay elementos</div>
+                }
+            </div>
+        }
+    </div>
+}

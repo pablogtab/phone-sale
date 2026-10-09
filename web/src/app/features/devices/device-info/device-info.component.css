@@ -1,0 +1,15 @@
+.info-container {
+    @apply rounded-lg border border-background-4 flex flex-col gap-3 p-3;
+    .info-detail {
+        @apply flex flex-row [&:not(:last-child)]:border-b border-[#2A2A2A] py-2 justify-between;
+
+        span {
+            &:first-child {
+                @apply text-sm font-semibold text-text-gray-500;
+            }
+            &:nth-child(2) {
+                @apply text-sm font-semibold;
+            }
+        }
+    }
+}

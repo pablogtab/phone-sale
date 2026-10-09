@@ -1,0 +1,43 @@
+<dialog-header [title]="data.title"></dialog-header>
+<form [formGroup]="clientForm" class="p-4 flex flex-col gap-4" (ngSubmit)="save()">
+    <div>
+        <label for="name">Nombre *</label>
+        <input id="name" formControlName="name" type="text" />
+    </div>
+    <div>
+        <label for="whatsapp">Whatsapp</label>
+        <input id="whatsapp" formControlName="whatsapp" type="tel" />
+    </div>
+    <div>
+        <label for="instagram">Instagram</label>
+        <input
+            id="instagram" formControlName="instagram"
+            type="text"
+            [value]="clientForm.get('instagram')?.value | lowercase"
+        />
+    </div>
+    <div>
+        <label for="identifier">DNI</label>
+        <input id="identifier" formControlName="identifier" type="number" />
+    </div>
+    <div>
+        <label for="birthDate">Fecha de Nacimiento</label>
+        <input id="birthDate" formControlName="birthDate" type="date" />
+    </div>
+    <div>
+        <label for="address">Dirección</label>
+        <input id="address" formControlName="address" type="text" />
+    </div>
+    @if (error()) { <p class="inline-error" role="alert">{{ error() }}</p> }
+    <div class="flex flex-row gap-4">
+        <button type="button" [disabled]="saving()" class="stroked primary w-full" (click)="cancel()">
+            Cancelar
+        </button>
+        <button
+            type="submit" [disabled]="clientForm.invalid || saving()"
+            class="raised primary w-full"
+        >
+            {{ saving() ? "Guardando…" : "Guardar cliente" }}
+        </button>
+    </div>
+</form>

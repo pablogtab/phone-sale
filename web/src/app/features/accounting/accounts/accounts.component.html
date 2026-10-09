@@ -1,0 +1,47 @@
+<section class="p-3 flex flex-col gap-4">
+    <p class="feature-description">Cuentas, movimientos y saldos conectados.</p>
+
+    <h2>{{ data.title }}</h2>
+    <div class="flex flex-col gap-2">
+        @for (entity of entities; track $index) {
+            <div
+                class="card p-4 flex w-full flex-col cursor-pointer"
+                (click)="openAccount(entity)"
+            >
+                <div class="flex flex-row justify-between items-center">
+                    <span class="text-xl">{{ entity.name }}</span>
+                    <!-- <button [cdkMenuTriggerFor]="menu2" class="flex items-center relative">
+                    <icon name='more-vertical'></icon>
+                </button>
+
+                <ng-template #menu2>
+                    <div class="menu" cdkMenu>
+                        <button class="menu-item" cdkMenuItem (click)="simpleTransaction(entity)">Nuevo Movimiento</button>
+                        <button class="menu-item" cdkMenuItem (click)="transferTransaction(entity)">Mov. a otra cuenta</button>
+                    </div>
+                </ng-template> -->
+                </div>
+                <div
+                    class="flex flex-col md:flex-row justify-center items-center mt-1 gap-2 md:gap-10"
+                >
+                    <span class="text-xl text-nowrap">
+                        USD:
+                        <span balanceColor [value]="entity.usdAcc.balance">
+                            {{ entity.usdAcc.balance | currency: " " }}
+                        </span>
+                    </span>
+                    <!-- <div class="flex flex-row gap-2">
+                    <icon name="arrow-down" class="p-2 cursor-pointer rounded-full bg-background-3 bg-opacity-60" (click)="currencyExchange(entity, 'ars')" />
+                    <icon name="arrow-up" class="p-2 cursor-pointer rounded-full bg-background-3 bg-opacity-60" (click)="currencyExchange(entity, 'usd')" />
+                </div> -->
+                    <span class="text-xl text-nowrap">
+                        ARS:
+                        <span balanceColor [value]="entity.arsAcc.balance">
+                            {{ entity.arsAcc.balance | currency: " " }}
+                        </span>
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+</section>

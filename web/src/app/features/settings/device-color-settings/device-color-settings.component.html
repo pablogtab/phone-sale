@@ -1,0 +1,54 @@
+<dialog-header [title]="data.title"></dialog-header>
+<section class="p-4 flex-1 pb-96 md:pb-0">
+    <div class="flex flex-row justify-between items-center">
+        <h3 class="text-text-gray-500">Colores Disponibles</h3>
+        <button class="raised primary" (click)="openNew()">Nuevo</button>
+    </div>
+
+    @for (color of colors; track color.id) {
+        <div
+            class="flex flex-row justify-between items-center p-4 mt-4 bg-background-gray-100 rounded-lg"
+        >
+            <div class="flex flex-row items-center">
+                <div
+                    class="w-8 h-8 rounded-full"
+                    [style.background-color]="color.hex"
+                ></div>
+                <p class="ml-4">{{ color.name }}</p>
+            </div>
+            <div class="flex flex-row items-center gap-4">
+                <button class="icon-button" (click)="openEdit(color)">
+                    <i class="icon-edit"></i>
+                </button>
+                <toggle
+                    [formControl]="toggleControls[color.id]"
+                    (change)="toggleActive($event, color)"
+                ></toggle>
+                <button
+                    [cdkMenuTriggerFor]="menu"
+                    class="flex items-center relative"
+                >
+                    <icon name="more-vertical"></icon>
+                </button>
+                <ng-template #menu>
+                    <div class="menu" cdkMenu>
+                        <button
+                            class="menu-item"
+                            cdkMenuItem
+                            (click)="openEdit(color)"
+                        >
+                            <span>Editar</span>
+                        </button>
+                        <button
+                            class="menu-item"
+                            cdkMenuItem
+                            (click)="deleteColor(color)"
+                        >
+                            <span>Eliminar</span>
+                        </button>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    }
+</section>

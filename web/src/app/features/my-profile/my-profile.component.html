@@ -1,0 +1,38 @@
+<section class="p-4">
+    <p class="feature-description">Tu perfil y el saldo de tus cuentas.</p>
+
+    <h2 class="text-text-gray-500">Mi perfil</h2>
+    <h1 class="mt-2">{{ user?.name }} {{ user?.lastname }}</h1>
+
+    <div class="card w-full">
+        <div
+            class="rounded-full bg-background-3 w-52 h-52 flex items-center justify-center mt-4 mx-auto hover:cursor-pointer"
+            (click)="changeProfilePicture()"
+        >
+            @if (user?.profilePicture) {
+                <img
+                    [src]="profilePictureUrl"
+                    alt="Foto de perfil"
+                    class="rounded-full w-full h-full object-cover"
+                />
+            } @else {
+                <icon
+                    name="user-focus"
+                    size="90"
+                    class="text-text-gray-100 text-4xl"
+                ></icon>
+            }
+        </div>
+        <h2>Saldo de cuenta</h2>
+        @for (acc of accounts; track $index) {
+            <div class="flex items-center text-xl">
+                <p>
+                    {{ acc.currency }}:
+                    <span balanceColor [value]="-acc.balance">{{
+                        acc.balance * -1 | currency: "$ "
+                    }}</span>
+                </p>
+            </div>
+        }
+    </div>
+</section>

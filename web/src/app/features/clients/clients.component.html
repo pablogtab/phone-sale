@@ -1,0 +1,26 @@
+<section class="clients-page">
+  <header class="clients-header"><div><h1>Clientes</h1><p>Toda la información de tus clientes, siempre a mano.</p></div><button type="button" class="raised primary" (click)="openModalAddClient()"><i class="pi pi-user-plus" aria-hidden="true"></i> Nuevo cliente</button></header>
+  <div class="clients-toolbar"><search-term /><span>{{ totalRows }} {{ totalRows === 1 ? 'cliente' : 'clientes' }}</span></div>
+  @if (loading()) { <app-page-state kind="loading" title="Cargando clientes" description="Buscando los contactos de tu tienda." /> }
+  @else if (failed()) { <app-page-state kind="error" title="No pudimos cargar tus clientes" description="Revisá la conexión y volvé a intentar." (retry)="searchClients()" /> }
+  @else if (!clients.length) {
+    <app-page-state [title]="search.searchTerm.value ? 'No encontramos ese cliente' : 'No hay clientes'" [description]="search.searchTerm.value ? 'Probá con otro nombre, teléfono o documento.' : 'Agregá un cliente para registrar sus compras y seguir su cuenta.'" />
+  }
+  @else {
+    <div class="client-list">
+      @for (client of clients; track client.publicId) {
+        <div class="client-row">
+          <button type="button" class="client-detail" (click)="clientDetail(client)"><span class="client-avatar">{{ initials(client) }}</span><span class="client-info"><strong>{{ client.name }}</strong><span>{{ client.phoneNumber || client.identifier || 'Sin datos de contacto' }}</span></span><i class="pi pi-angle-right" aria-hidden="true"></i></button>
+          @if (client.phoneNumber || client.instagram) {
+            <button type="button" class="client-menu" [cdkMenuTriggerFor]="menu" aria-label="Opciones de contacto"><i class="pi pi-ellipsis-v" aria-hidden="true"></i></button>
+            <ng-template #menu><div class="menu" cdkMenu>
+              @if (client.phoneNumber) { <button class="menu-item" cdkMenuItem (click)="whatsapp(client)"><i class="pi pi-whatsapp" aria-hidden="true"></i> WhatsApp</button> }
+              @if (client.instagram) { <button class="menu-item" cdkMenuItem (click)="instagram(client)"><i class="pi pi-instagram" aria-hidden="true"></i> Instagram</button> }
+            </div></ng-template>
+          }
+        </div>
+      }
+    </div>
+  }
+  <paginator [hidden]="loading() || failed() || !clients.length" />
+</section>

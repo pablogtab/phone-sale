@@ -1,0 +1,96 @@
+<dialog-header title="Nuevo Pago"></dialog-header>
+<section class="p-4">
+    <form [formGroup]="form" class="flex flex-col gap-4">
+        <div class="flex flex-row gap-4">
+            <div class="flex-[4]">
+                <span>Método de pago</span>
+                <selectable
+                    [value]="form.controls.paymentType"
+                    [config]="selectableConfigPaymentTypes"
+                >
+                    @for (item of paymentTypes; track $index) {
+                        <selectable-option [value]="item"></selectable-option>
+                    }
+                </selectable>
+            </div>
+        </div>
+
+        @switch (form.controls.paymentType.value) {
+            @case ("bank_transfer") {
+                <div class="flex flex-col gap-4">
+                    <span>Transferencia bancaria</span>
+                    <selectable
+                        [value]="form.controls.transferAccountType"
+                        [config]="selectableConfigTransferTypes"
+                    >
+                        @for (item of transferTypes; track $index) {
+                            <selectable-option
+                                [value]="item"
+                            ></selectable-option>
+                        }
+                    </selectable>
+                    @switch (form.controls.transferAccountType.value) {
+                        @case ("bank") {
+                            <bank-search formControlName="bank"></bank-search>
+                        }
+                        @case ("provider") {
+                            <provider-search
+                                formControlName="provider"
+                            ></provider-search>
+                        }
+                        @case ("user") {
+                            <user-search formControlName="user"></user-search>
+                        }
+                    }
+                </div>
+            }
+            @case ("cash") {
+                <div>
+                    <span>Caja</span>
+                    <cash-accounts-search
+                        formControlName="cashAccount"
+                    ></cash-accounts-search>
+                </div>
+            }
+            @case ("device") {
+                <div>
+                    <span>Entrega equipo</span>
+                    <app-fast-add-device></app-fast-add-device>
+                </div>
+            }
+        }
+
+        <div class="flex items-end justify-between gap-4">
+            <div>
+                <span>Tipo cambio</span>
+                <input formControlName="exchangeRate" currencyMask />
+            </div>
+            <div class="flex flex-1">
+                <chips formControlName="currency" class="mb-1 w-36">
+                    @for (item of currencies; track $index) {
+                        <chip [value]="item[0]">{{ item[1] }}</chip>
+                    }
+                </chips>
+            </div>
+        </div>
+
+        <div class="flex flex-row gap-4">
+            <div>
+                <span>Monto USD</span>
+                <input formControlName="amountUSD" currencyMask />
+            </div>
+            <div>
+                <span>Monto ARS</span>
+                <input formControlName="amountARS" currencyMask />
+            </div>
+        </div>
+        <button
+            type="button"
+            class="raised primary"
+            (click)="save()"
+            [disabled]="!isValidForm()"
+        >
+            Agregar {{ data.cashback ? "Vuelto" : "Pago" }}
+        </button>
+    </form>
+</section>

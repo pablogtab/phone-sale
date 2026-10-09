@@ -1,0 +1,27 @@
+<dialog-header title="Testear equipo"></dialog-header>
+<section class="p-4 flex flex-col gap-4">
+    @if (user) {
+        <div class="flex flex-row gap-4 items-center">
+            @if (user.profilePicture) {
+                <div class="size-28 rounded-lg overflow-hidden">
+                    <img
+                        [src]="baseFilesUrl + user.profilePicture"
+                        alt="mainPhoto?.publicId"
+                        class="size-28 object-cover"
+                    />
+                </div>
+            }
+            <div class="flex flex-col flex-1">
+                <p class="text-sm font-bold text-primary">USUARIO ACTUAL</p>
+                <p class="text-2xl font-bold">
+                    {{ user.name }} {{ user.lastname }}
+                </p>
+            </div>
+        </div>
+        <h3 class="text-center">¿El equipo fué testeado?</h3>
+        <div class="flex flex-row gap-4">
+            <button class="stroked warn w-full" (click)="cancel()">NO</button>
+            <button class="raised primary w-full" (click)="save()">SI</button>
+        </div>
+    }
+</section>

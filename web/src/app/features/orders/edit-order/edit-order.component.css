@@ -1,0 +1,7 @@
+tr {
+    text-align: left !important;
+}
+
+tr :last-child {
+    text-align: center;
+}

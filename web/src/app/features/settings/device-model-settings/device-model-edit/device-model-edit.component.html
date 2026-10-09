@@ -1,0 +1,93 @@
+<dialog-header [title]="data.title" />
+<section class="p-4 flex flex-col gap-4">
+    <div>
+        <span>Nombre del modelo</span>
+        <input [formControl]="nameControl" />
+    </div>
+
+    <span>Colores disponibles</span>
+    <div>
+        <div class="flex justify-center gap-2 flex-row flex-wrap">
+            @for (color of availableColors; track $index) {
+                <div
+                    class="px-4 py-2 rounded-full border border-primary flex flex-row items-center gap-1 bg-opacity-25 cursor-pointer"
+                    [class.bg-primary-hover]="deviceColors.has(color.id)"
+                    (click)="toggleColor(color.id)"
+                >
+                    <div
+                        class="rounded-full size-4"
+                        [style.background-color]="color.hex"
+                    ></div>
+                    <span>{{ color.name }}</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <span>Almacenamientos Disponibles</span>
+    <div class="flex justify-center gap-2 flex-row flex-wrap">
+        @for (storage of availableStorageSizes; track $index) {
+            <div
+                class="px-4 py-2 rounded-full border border-primary flex flex-row items-center gap-1 bg-opacity-25 cursor-pointer"
+                [class.bg-primary-hover]="deviceStorageSizes.has(storage.id)"
+                (click)="toggleStorage(storage.id)"
+            >
+                <span>{{ storage.size }}</span>
+            </div>
+        }
+    </div>
+
+    <div class="flex flex-row justify-between items-center">
+        <span>Accesorios recomendados</span>
+        @if (!editingAccesories) {
+            <p-button
+                text
+                [icon]="
+                    recommendedAccesories.length ? 'pi pi-pencil' : 'pi pi-plus'
+                "
+                rounded
+                (onClick)="editingAccesories = true"
+            ></p-button>
+        } @else {
+            <p-button
+                text
+                icon="pi pi-times"
+                rounded
+                severity="warn"
+                (onClick)="editingAccesories = false"
+            ></p-button>
+        }
+    </div>
+    @if (editingAccesories) {
+        <product-search
+            [unique]="false"
+            (onChange)="addAccesory($event)"
+        ></product-search>
+    }
+    <div
+        cdkDropList
+        cdkDropListOrientation="mixed"
+        (cdkDropListDropped)="drop($event)"
+        [cdkDropListDisabled]="!editingAccesories"
+        class="flex justify-center gap-2 flex-row flex-wrap"
+    >
+        @for (accesory of recommendedAccesories; track accesory.id) {
+            <p-chip
+                cdkDrag
+                [removable]="editingAccesories"
+                [label]="accesory.description"
+                (onRemove)="removeAccesory(accesory)"
+            ></p-chip>
+        }
+    </div>
+
+    <div class="flex flex-row gap-4">
+        <button class="stroked primary w-full" (click)="cancel()">
+            Cancelar
+        </button>
+        <button class="raised primary w-full" (click)="save()">Guardar</button>
+    </div>
+    @if (modelId) {
+        <button class="stroked warn w-full" (click)="delete()">Eliminar</button>
+    }
+</section>

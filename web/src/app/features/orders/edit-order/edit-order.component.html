@@ -1,0 +1,157 @@
+<form [formGroup]="form" class="p-4 flex flex-col gap-4 pb-40">
+    <go-back
+        [title]="title"
+        previousRoute="orders"
+        previousRouteName="Órdenes"
+    ></go-back>
+    <chips formControlName="type">
+        <chip value="faceid">Tienda</chip>
+        <chip value="sale">Sale</chip>
+        <chip value="wholesale">Mayorista</chip>
+    </chips>
+    <div class="flex flex-row flex-wrap gap-4 items-center">
+        <div class="min-w-52 flex-[2]">
+            <span>Cliente</span>
+            <client-search formControlName="client"></client-search>
+        </div>
+        <div class="min-w-52 flex-[2]">
+            <span>Usuario que entrega</span>
+            <user-search formControlName="deliveredByUser"></user-search>
+        </div>
+        <div class="min-w-52 flex-1">
+            <span>Cotizacion (USD)</span>
+            <p-inputnumber
+                formControlName="exchangeRate"
+                type="currency"
+                prefix="$ "
+                [min]="0"
+            />
+        </div>
+    </div>
+
+    <div class="card w-full flex flex-col gap-2">
+        <h3>Productos</h3>
+        <div class="flex flex-row flex-wrap gap-4 items-center">
+            <div class="min-w-72 flex-[3]">
+                <span>Equipo</span>
+                <product-search formControlName="product"></product-search>
+            </div>
+            <div class="min-w-72 flex-[3]">
+                <span>Accesorios</span>
+                <product-search
+                    [unique]="false"
+                    formControlName="accesory"
+                    #accesorySearch
+                ></product-search>
+            </div>
+            <div class="min-w-24 flex-1">
+                <span>Precio (USD)</span>
+                <p-inputnumber
+                    formControlName="priceUSD"
+                    type="currency"
+                    prefix="$ "
+                    [min]="0"
+                />
+            </div>
+            <div class="min-w-24 flex-1">
+                <span>Precio (ARS)</span>
+                <p-inputnumber
+                    formControlName="priceARS"
+                    type="currency"
+                    prefix="$ "
+                    [min]="0"
+                />
+            </div>
+            <div class="min-w-24 flex-1">
+                <span>Cantidad</span>
+                <p-inputnumber formControlName="quantity" />
+            </div>
+            <button
+                class="stroked primary self-end min-w-40 md:max-w-40 flex-1"
+                (click)="addProduct()"
+                [disabled]="form.disabled"
+            >
+                Agregar
+            </button>
+        </div>
+        <div class="h-[1px] my-3 bg-background-4 w-full"></div>
+        <grid
+            [data]="products"
+            [config]="orderItemGridConfig"
+            (action)="orderItemsGridAction($event)"
+        ></grid>
+    </div>
+    <div class="card w-full flex flex-col gap-2">
+        <div class="flex flex-row justify-between items-center">
+            <div class="flex flex-col">
+                <p class="text-xl">
+                    <b>Total a pagar:</b> <br />
+                    {{ totalUSD | currency: " " }} (USD) <br />
+                    {{ totalARS | currency: " " }} (ARS)
+                </p>
+            </div>
+            <button
+                class="stroked primary min-w-40 max-w-40 md:max-w-40 flex-1"
+                (click)="newPayment()"
+                [disabled]="form.disabled"
+            >
+                Nuevo Pago
+            </button>
+        </div>
+        <div class="h-[1px] my-3 bg-background-4 w-full"></div>
+        <grid
+            [data]="payments"
+            [config]="paymentsGridConfig"
+            (action)="paymentGridAction($event)"
+        ></grid>
+        <div class="h-[1px] w-full bg-background-4"></div>
+        <div class="flex flex-row justify-between items-center flex-wrap gap-4">
+            <span class="text-xl"
+                ><b>Saldo:</b>
+                <span balanceColor [value]="balanceUSD">
+                    {{ balanceUSD | currency: " " }}
+                </span>
+                (USD)
+            </span>
+            @if (balanceUSD < 0) {
+                <button
+                    class="stroked primary min-w-40 md:max-w-40 flex-1"
+                    (click)="newCashback()"
+                    [disabled]="form.disabled"
+                >
+                    Agregar Vuelto
+                </button>
+            }
+        </div>
+    </div>
+    <div class="flex flex-row justify-end items-center flex-wrap gap-4">
+        @if (form.controls.type.value === "wholesale") {
+            <button
+                class="stroked primary min-w-40 flex-1"
+                (click)="saveCredit()"
+                [disabled]="!products.length || form.disabled"
+            >
+                Pago a CC
+            </button>
+        }
+        @if (enableRounding) {
+            <button
+                class="stroked primary min-w-40 flex-1"
+                (click)="rounding()"
+                [disabled]="!products.length || form.disabled"
+            >
+                Redondear
+            </button>
+        }
+        <button
+            class="stroked primary min-w-40 md:max-w-40 flex-1"
+            [disabled]="disabledSave"
+            (click)="saveOrder()"
+        >
+            Guardar
+            @if (isDepositing) {
+                y Señar
+            }
+        </button>
+    </div>
+</form>

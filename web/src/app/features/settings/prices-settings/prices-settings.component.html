@@ -1,0 +1,101 @@
+<section class="p-4">
+    <p class="feature-description">Referencias de compra y venta por modelo.</p>
+
+    <go-back
+        title="Precios de Referencia"
+        previousRouteName="Home"
+        previousRoute="/"
+    ></go-back>
+
+    <edit-save-cancel
+        class="flex justify-end"
+        [hideDelete]="true"
+        [isEditing]="isEditing"
+        (edit)="edit()"
+        (cancel)="cancel()"
+        (save)="save()"
+    >
+    </edit-save-cancel>
+
+    <h3 class="mt-4">Precios de Venta Nuevos</h3>
+
+    <div
+        [ngTemplateOutlet]="modelsTemplate"
+        [ngTemplateOutletContext]="{ dataSource: models }"
+    ></div>
+</section>
+<section class="p-4">
+    <h3 class="mt-4">Precios de Venta Usados</h3>
+    <div
+        [ngTemplateOutlet]="modelsTemplate"
+        [ngTemplateOutletContext]="{ dataSource: usedModels }"
+    ></div>
+</section>
+<ng-template #modelsTemplate let-dataSource="dataSource">
+    <div class="overflow-x-auto">
+        <table
+            cdk-table
+            [dataSource]="dataSource"
+            class="w-full price-table mt-2"
+        >
+            <ng-container cdkColumnDef="model">
+                <th cdk-header-cell *cdkHeaderCellDef class="text-left">
+                    Modelo
+                </th>
+                <td cdk-cell *cdkCellDef="let element">
+                    {{ element.model.name }} {{ element.size.size }}
+                </td>
+            </ng-container>
+            <ng-container cdkColumnDef="purchasePrice">
+                <th cdk-header-cell *cdkHeaderCellDef class="text-left">
+                    Precio de Compra
+                </th>
+                <td cdk-cell *cdkCellDef="let element">
+                    <input
+                        [disabled]="!isEditing"
+                        type="number"
+                        [(ngModel)]="element.purchasePrice"
+                    />
+                </td>
+            </ng-container>
+            <ng-container cdkColumnDef="sellingPrice">
+                <th cdk-header-cell *cdkHeaderCellDef class="text-left">
+                    Precio de tienda
+                </th>
+                <td cdk-cell *cdkCellDef="let element">
+                    <input
+                        [disabled]="!isEditing"
+                        type="number"
+                        [(ngModel)]="element.sellingPrice"
+                    />
+                </td>
+            </ng-container>
+            <ng-container cdkColumnDef="sellingPriceSale">
+                <th cdk-header-cell *cdkHeaderCellDef class="text-left">
+                    Precio Sale
+                </th>
+                <td cdk-cell *cdkCellDef="let element">
+                    <input
+                        [disabled]="!isEditing"
+                        type="number"
+                        [(ngModel)]="element.sellingPriceSale"
+                    />
+                </td>
+            </ng-container>
+            <ng-container cdkColumnDef="sellingPriceWholesale">
+                <th cdk-header-cell *cdkHeaderCellDef class="text-left">
+                    Precio Mayorista
+                </th>
+                <td cdk-cell *cdkCellDef="let element">
+                    <input
+                        [disabled]="!isEditing"
+                        type="number"
+                        [(ngModel)]="element.sellingPriceWholesale"
+                    />
+                </td>
+            </ng-container>
+            <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
+            <tr cdk-row *cdkRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+    </div>
+</ng-template>

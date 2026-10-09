@@ -1,0 +1,222 @@
+<section class="p-4 md:px-8 flex flex-col gap-3">
+    <p class="feature-description">
+        Ajustes por batería, garantía y accesorios.
+    </p>
+
+    <div class="flex flex-row justify-between content-center">
+        <h2 style="margin: 10px">Ajuste por modelo</h2>
+    </div>
+
+    <ng-container
+        *ngIf="
+            deviceModelWithAdjustments$ | async as deviceModelWithAdjustments
+        "
+    >
+        <ng-container *ngIf="deviceModelWithAdjustments.length === 0">
+            <div
+                class="d-flex flex-column align-items-center justify-content-center mt-5"
+            >
+                <h4>No hay modelos disponibles</h4>
+            </div>
+        </ng-container>
+        @for (
+            deviceModelWithAdjustment of deviceModelWithAdjustments;
+            track $index
+        ) {
+            <b class="title">{{
+                deviceModelWithAdjustment.modelName | titlecase
+            }}</b>
+            <div class="card">
+                <p-toast />
+                <p-table
+                    [value]="deviceModelWithAdjustment.modelAdjustments"
+                    dataKey="id"
+                    editMode="row"
+                    [tableStyle]="{ width: '50rem' }"
+                >
+                    <ng-template #header>
+                        <tr>
+                            <th style="width: 20%">Tipo</th>
+                            <th style="width: 20%">Desde</th>
+                            <th style="width: 20%">Hasta</th>
+                            <th style="width: 20%">$</th>
+                            <th style="width: 20%">Categoria</th>
+                            <th style="width: 20%">
+                                <button
+                                    pButton
+                                    pRipple
+                                    type="button"
+                                    icon="pi pi-plus"
+                                    text
+                                    rounded
+                                    severity="secondary"
+                                    (click)="addRow(deviceModelWithAdjustment)"
+                                ></button>
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template
+                        #body
+                        let-modelAdjustment
+                        let-editing="editing"
+                        let-ri="rowIndex"
+                    >
+                        <tr [pEditableRow]="modelAdjustment">
+                            <td>
+                                <p-cellEditor>
+                                    <p-select
+                                        [options]="[types]"
+                                        [(ngModel)]="modelAdjustment.type"
+                                        optionLabel="name"
+                                        placeholder="Typo"
+                                        class="w-full md:w-56"
+                                    />
+                                    <ng-template #input>
+                                        <p-select
+                                            [options]="types"
+                                            [(ngModel)]="modelAdjustment.type"
+                                            placeholder="Tipo"
+                                            class="w-full md:w-56"
+                                            appendTo="body"
+                                        />
+                                    </ng-template>
+                                    <ng-template #output>
+                                        {{ modelAdjustment.type | titlecase }}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>
+                                <p-cellEditor>
+                                    <ng-template #input>
+                                        <input
+                                            pInputText
+                                            type="number"
+                                            [(ngModel)]="
+                                                modelAdjustment.rangeStart
+                                            "
+                                            required
+                                        />
+                                    </ng-template>
+                                    <ng-template #output>
+                                        {{ modelAdjustment.rangeStart }}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>
+                                <p-cellEditor>
+                                    <ng-template #input>
+                                        <input
+                                            pInputText
+                                            type="number"
+                                            [(ngModel)]="
+                                                modelAdjustment.rangeEnd
+                                            "
+                                            required
+                                        />
+                                    </ng-template>
+                                    <ng-template #output>
+                                        {{ modelAdjustment.rangeEnd }}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>
+                                <p-cellEditor>
+                                    <ng-template #input>
+                                        <input
+                                            pInputText
+                                            type="number"
+                                            [(ngModel)]="modelAdjustment.factor"
+                                        />
+                                    </ng-template>
+                                    <ng-template #output>
+                                        {{
+                                            modelAdjustment.factor
+                                                | currency: "USD"
+                                        }}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+
+                            <td>
+                                <p-cellEditor>
+                                    <ng-template #input>
+                                        <p-select
+                                            [options]="categories"
+                                            [(ngModel)]="
+                                                modelAdjustment.description
+                                            "
+                                            placeholder="Categoria"
+                                            class="w-full md:w-56"
+                                            appendTo="body"
+                                        />
+                                    </ng-template>
+                                    <ng-template #output>
+                                        {{
+                                            modelAdjustment.description
+                                                | titlecase
+                                        }}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>
+                                <div
+                                    class="flex items-center justify-center gap-2"
+                                >
+                                    <button
+                                        *ngIf="!editing"
+                                        pButton
+                                        pRipple
+                                        type="button"
+                                        pInitEditableRow
+                                        icon="pi pi-pencil"
+                                        (click)="onRowEditInit(modelAdjustment)"
+                                        text
+                                        rounded
+                                        severity="secondary"
+                                    ></button>
+                                    <button
+                                        *ngIf="!editing"
+                                        pButton
+                                        pRipple
+                                        type="button"
+                                        icon="pi pi-trash"
+                                        (click)="deleteRow(modelAdjustment)"
+                                        text
+                                        rounded
+                                        severity="secondary"
+                                    ></button>
+                                    <button
+                                        *ngIf="editing"
+                                        pButton
+                                        pRipple
+                                        type="button"
+                                        pSaveEditableRow
+                                        icon="pi pi-check"
+                                        (click)="onRowEditSave(modelAdjustment)"
+                                        text
+                                        rounded
+                                        severity="secondary"
+                                    ></button>
+                                    <button
+                                        *ngIf="editing"
+                                        pButton
+                                        pRipple
+                                        type="button"
+                                        pCancelEditableRow
+                                        icon="pi pi-times"
+                                        (click)="
+                                            onRowEditCancel(modelAdjustment, ri)
+                                        "
+                                        text
+                                        rounded
+                                        severity="secondary"
+                                    ></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        }
+    </ng-container>
+</section>

@@ -1,0 +1,41 @@
+<div class="m-4 gap-2 flex flex-col items-center">
+    <div
+        class="h-8 w-8 rounded-full flex justify-center items-center"
+        [class.bg-primary]="data.type === 'success'"
+        [class.bg-[#f87171]]="data.type === 'error'"
+        [class.bg-[#fbbf24]]="data.type === 'warning'"
+        [class.bg-[#60a5fa]]="data.type === 'question'"
+    >
+        @if (data.type === "success") {
+            <icon name="check" />
+        }
+        @if (data.type === "error") {
+            <icon name="close" />
+        }
+        @if (data.type === "warning") {
+            <icon name="warning" />
+        }
+        @if (data.type === "question") {
+            <icon name="question-mark" size="16" />
+        }
+    </div>
+    <div>
+        <p class="md:text-lg !p-0 !m-0 text-center">{{ data.message }}</p>
+    </div>
+    @if (data.type === "question") {
+        <div class="m-2 md:gap-6 flex flex-row gap-2 w-full">
+            <button
+                class="stroked warn flex-1"
+                (click)="dialogRef.close(false)"
+            >
+                {{ data.buttonNo || "Cancelar" }}
+            </button>
+            <button
+                class="raised primary flex-1"
+                (click)="dialogRef.close(true)"
+            >
+                {{ data.buttonYes || "OK" }}
+            </button>
+        </div>
+    }
+</div>

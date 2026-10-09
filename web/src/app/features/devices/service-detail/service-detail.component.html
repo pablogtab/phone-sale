@@ -1,0 +1,42 @@
+<ng-container *ngIf="device$ | async as device">
+    <div class="popup-container">
+        <p class="popup-title">
+            {{ device.description | titlecase }}
+        </p>
+        <form [formGroup]="form" class="form-container">
+            <div style="display: flex; gap: 10px">
+                <span>Remplazo de bateria</span>
+                <p-toggleswitch formControlName="bateryReplacement" />
+            </div>
+            <div>
+                <span class="text-lg font-medium">Motivo servicio</span>
+                <div class="flex flex-col gap-2">
+                    <textarea
+                        placeholder="Motivo servicio"
+                        formControlName="technicalServiceDescription"
+                    ></textarea>
+                </div>
+            </div>
+            <div>
+                <span class="text-lg font-medium">Depreciación</span>
+                <input type="number" formControlName="depreciation" />
+            </div>
+            <div>
+                <span class="text-lg font-medium">Costo reparación</span>
+                <input type="number" formControlName="serviceCost" />
+            </div>
+            <div>
+                <span class="text-lg font-medium">Historial (interno)</span>
+                <div class="flex flex-col gap-2">
+                    <textarea
+                        placeholder="Detalles, fallas, aclaraciones, etc..."
+                        formControlName="internalComments"
+                    ></textarea>
+                </div>
+            </div>
+        </form>
+        <button class="raised primary" (click)="save()">
+            <span>Guardar</span>
+        </button>
+    </div>
+</ng-container>

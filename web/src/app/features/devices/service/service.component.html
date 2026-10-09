@@ -1,0 +1,30 @@
+<ng-container *ngIf="device$ | async as device">
+    <div class="popup-container">
+        <p class="popup-title">
+            Reparación: {{ device.description | titlecase }}
+        </p>
+        <form [formGroup]="form" class="form-container">
+            <ng-container *ngIf="providers$ | async as providers">
+                <p-select
+                    formControlName="providerId"
+                    [options]="providers"
+                    optionLabel="name"
+                    placeholder="Proveedor"
+                    optionValue="id"
+                />
+            </ng-container>
+            <p class="label">Fecha reparación</p>
+            <p-datepicker formControlName="date"></p-datepicker>
+            <p class="label">Motivo</p>
+            <textarea
+                pTextarea
+                formControlName="reason"
+                rows="5"
+                cols="30"
+            ></textarea>
+        </form>
+        <button class="raised primary" (click)="save()">
+            <span>Guardar</span>
+        </button>
+    </div>
+</ng-container>

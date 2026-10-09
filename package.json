@@ -1,0 +1,28 @@
+{
+  "name": "phone-sale",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Phone retail management \u2014 modular NestJS API and Angular web",
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
+  },
+  "scripts": {
+    "setup": "npm ci --prefix api && npm ci --prefix web",
+    "dev:api": "npm run start:dev --prefix api",
+    "dev:web": "npm start --prefix web",
+    "build": "npm run build --prefix api && npm run build --prefix web",
+    "test:api": "npm test --prefix api -- --runInBand",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "npm run migration:run --prefix api",
+    "db:seed": "npm run seed --prefix api",
+    "test:web": "npm test --prefix web -- --watch=false",
+    "test:integration": "npm run test:integration --prefix api",
+    "test": "npm run test:api && npm run test:web && npm run test:integration",
+    "app:up": "docker compose -f docker-compose.yml -f compose.app.yaml up --build -d",
+    "app:down": "docker compose -f docker-compose.yml -f compose.app.yaml down",
+    "db:seed:starter": "npm run seed:starter --prefix api",
+    "db:seed:demo": "npm run seed:demo --prefix api",
+    "test:web:coverage": "npm run test:coverage --prefix web"
+  }
+}

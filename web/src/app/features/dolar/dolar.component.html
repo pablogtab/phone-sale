@@ -1,0 +1,21 @@
+<section class="rate-page">
+  <h1>Cotización del dólar</h1>
+  <p class="feature-description">Definí el valor de referencia para tu tienda. Vos decidís cuándo actualizarlo.</p>
+  @if (loading()) { <app-page-state kind="loading" title="Cargando cotización" /> }
+  @else if (failed()) { <app-page-state kind="error" title="No pudimos cargar la cotización" (retry)="load()" /> }
+  @else {
+    <div class="rate-card">
+      <div class="current-rate"><span>COTIZACIÓN ACTUAL</span><strong>{{ dolar ? (dolar | currency:'ARS':'symbol':'1.2-2') : 'Sin configurar' }}</strong><p>por cada dólar estadounidense</p>
+        @if (dolar && updatedAt) { <small>Último cambio: {{ updatedAt | date:'dd/MM/yyyy HH:mm' }}</small> }
+      </div>
+      <form (submit)="$event.preventDefault(); save()" class="rate-form">
+        <div class="form-field"><label for="manual-rate">Nuevo valor en pesos (ARS)</label><div class="rate-input"><span>$</span><input id="manual-rate" type="number" min="0.01" max="100000000" step="0.01" inputmode="decimal" placeholder="Ingresá una cotización" [formControl]="rate" /></div></div>
+        @if (rate.touched && rate.invalid) { <p class="validation-error">Ingresá un valor mayor a cero.</p> }
+        <p class="rate-help">Se completa en nuevas compras y ventas. Las operaciones ya guardadas conservan su cotización.</p>
+        @if (message()) { <p class="inline-success" role="status">{{ message() }}</p> }
+        @if (saveError()) { <p class="inline-error" role="alert">{{ saveError() }}</p> }
+        <button type="submit" class="raised primary" [disabled]="saving() || rate.invalid">{{ saving() ? 'Guardando…' : 'Guardar cotización' }}</button>
+      </form>
+    </div>
+  }
+</section>

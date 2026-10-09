@@ -1,0 +1,23 @@
+<div class="flex flex-row gap-3" style="flex-direction: inherit">
+    <button class="raised primary min-w-24" (click)="editToggle()">
+        @if (isEditing) {
+            <span> Guardar </span>
+        } @else {
+            <span> Editar </span>
+        }
+    </button>
+    @if (isEditing) {
+        <button class="stroked warn" (click)="cancel.emit()">Cancelar</button>
+    }
+    @if (!isEditing && !hideDelete) {
+        <button
+            class="stroked warn flex flex-row gap-2 items-center"
+            (click)="handleDel()"
+        >
+            @if (delTimes > 0) {
+                <icon @inOutAnimation-0.3 name="trash" color="warn"></icon>
+            }
+            Eliminar
+        </button>
+    }
+</div>

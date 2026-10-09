@@ -1,0 +1,29 @@
+<dialog-header [title]="data.title" />
+<form [formGroup]="form" class="p-4 flex flex-col gap-4">
+    <!-- <div>
+    <label for="name">Nombre *</label>
+    <input formControlName="name" type="text">
+  </div> -->
+    @for (field of fields; track $index) {
+        <div>
+            <label for="{{ field.label }}">{{ field.label }}</label>
+            <input
+                [formControlName]="field.key.toString()"
+                [type]="field.type"
+                #inputs
+            />
+        </div>
+    }
+    <div class="flex flex-row gap-4">
+        <button class="stroked primary w-full" (click)="cancel()">
+            Cancelar
+        </button>
+        <button
+            [disabled]="form.invalid"
+            class="raised primary w-full"
+            (click)="save()"
+        >
+            Guardar
+        </button>
+    </div>
+</form>

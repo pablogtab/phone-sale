@@ -1,0 +1,14 @@
+<button
+    type="button"
+    role="checkbox"
+    [attr.aria-checked]="value"
+    [attr.aria-label]="label"
+    [disabled]="disabled"
+    class="size-6 bg-background-3 border border-primary rounded flex justify-center items-center cursor-pointer transition duration-300 ease-in-out"
+    (click)="toggleCheckbox()"
+    [class.bg-primary]="value"
+>
+    <ng-container *ngIf="value">
+        <icon name="check" color="white"></icon>
+    </ng-container>
+</button>

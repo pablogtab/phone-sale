@@ -1,0 +1,22 @@
+.price-table {
+    @apply bg-background-2;
+    tr {
+        /*odd columns background color 4*/
+
+        @apply h-12;
+    }
+
+    th {
+        &:first-child {
+            @apply min-w-[300px] pl-4;
+        }
+    }
+
+    td {
+        @apply min-w-[100px];
+
+        &:first-child {
+            @apply min-w-[300px] pl-4;
+        }
+    }
+}

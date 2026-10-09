@@ -1,0 +1,26 @@
+# Add the application services to the local PostgreSQL stack:
+# docker compose -f docker-compose.yml -f compose.app.yaml up --build -d
+services:
+  api:
+    build: ./api
+    env_file: ./api/.env
+    environment:
+      NODE_ENV: production
+      PORT: 3210
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - phone_sale_uploads:/app/uploads
+    restart: unless-stopped
+  web:
+    build: ./web
+    ports:
+      - "127.0.0.1:8085:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+volumes:
+  phone_sale_uploads:

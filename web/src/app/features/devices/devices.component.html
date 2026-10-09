@@ -1,0 +1,175 @@
+<section class="inventory-page">
+    <div class="page-heading">
+        <div>
+            <h1>Equipos</h1>
+            <p>
+                Disponibilidad, reservas y servicio técnico en una sola vista.
+            </p>
+        </div>
+        <button type="button" class="raised primary" (click)="newDevice()">
+            <i class="pi pi-plus" aria-hidden="true"></i> Nuevo equipo
+        </button>
+    </div>
+    <form [formGroup]="filters" class="inventory-filters">
+        <search-term />
+        <p-multiselect
+            [options]="statuses"
+            formControlName="status"
+            placeholder="Filtrar por estado"
+            ariaLabel="Estados de equipos"
+            styleClass="w-full"
+        >
+            <ng-template let-status pTemplate="item">{{
+                getDeviceStatus(status)
+            }}</ng-template>
+            <ng-template let-status pTemplate="selectedItems">{{
+                getDeviceStatus(status)
+            }}</ng-template>
+        </p-multiselect>
+    </form>
+    @if (loading()) {
+        <app-page-state
+            kind="loading"
+            title="Cargando inventario"
+            description="Buscando los equipos de tu tienda."
+        />
+    } @else if (failed()) {
+        <app-page-state
+            kind="error"
+            title="No pudimos cargar los equipos"
+            description="Revisá la conexión y volvé a intentar."
+            (retry)="loadModels()"
+        />
+    } @else if (!totalDevices) {
+        <app-page-state
+            title="No hay equipos"
+            description="Agregá un equipo o ajustá los filtros para ver tu inventario."
+        />
+    } @else {
+        <div class="inventory-count">
+            {{ totalDevices }} equipos en esta vista
+        </div>
+        @for (model of models; track model.id) {
+            @if (model.devices.length) {
+                <div class="model-heading">
+                    <h2>{{ model.name }}</h2>
+                    <span>{{ model.devices.length }} equipos</span>
+                </div>
+                <div class="device-list">
+                    @for (device of model.devices; track device.id) {
+                        <div class="device-row">
+                            <button
+                                type="button"
+                                class="device-main"
+                                (click)="deviceDetail(device.id)"
+                            >
+                                <span class="device-image">
+                                    @if (device.mainPhotoUrl) {
+                                        <img
+                                            [src]="
+                                                baseFilesUrl +
+                                                device.mainPhotoUrl
+                                            "
+                                            [alt]="device.description"
+                                        />
+                                    } @else {
+                                        <i
+                                            class="pi pi-mobile"
+                                            aria-hidden="true"
+                                        ></i>
+                                    }
+                                </span>
+                                <span class="device-info"
+                                    ><span class="device-description">{{
+                                        device.description
+                                    }}</span
+                                    ><span class="device-meta"
+                                        >Equipo #{{ device.id }}
+                                        @if (device.imei) {
+                                            · IMEI {{ device.imei }}
+                                        }
+                                    </span>
+                                    @if (!device.originProviderId) {
+                                        <span class="missing-purchase"
+                                            >Compra pendiente de registrar</span
+                                        >
+                                    }
+                                </span>
+                            </button>
+                            <span
+                                class="status-badge"
+                                [class.available]="
+                                    device.status === 'available'
+                                "
+                                [class.repairing]="
+                                    device.status === 'repairing'
+                                "
+                                >{{ getDeviceStatus(device.status) }}</span
+                            >
+                            <button
+                                type="button"
+                                [cdkMenuTriggerFor]="deviceMenu"
+                                class="row-menu"
+                                aria-label="Acciones del equipo"
+                            >
+                                <i
+                                    class="pi pi-ellipsis-v"
+                                    aria-hidden="true"
+                                ></i>
+                            </button>
+                            <ng-template #deviceMenu
+                                ><div class="menu" cdkMenu>
+                                    <button
+                                        class="menu-item"
+                                        cdkMenuItem
+                                        (click)="editDevice(device)"
+                                    >
+                                        Editar equipo
+                                    </button>
+                                    @if (
+                                        device.status !==
+                                        DEVICE_STATUSES.repairing
+                                    ) {
+                                        <button
+                                            class="menu-item"
+                                            cdkMenuItem
+                                            (click)="createService(device)"
+                                        >
+                                            Enviar a servicio técnico
+                                        </button>
+                                    }
+                                    @if (
+                                        device.status ===
+                                        DEVICE_STATUSES.repairing
+                                    ) {
+                                        <button
+                                            class="menu-item"
+                                            cdkMenuItem
+                                            (click)="
+                                                createServiceDetail(device)
+                                            "
+                                        >
+                                            Completar reparación
+                                        </button>
+                                    }
+                                    @if (
+                                        device.status ===
+                                        DEVICE_STATUSES.transit
+                                    ) {
+                                        <button
+                                            class="menu-item"
+                                            cdkMenuItem
+                                            (click)="setAsAvailable(device)"
+                                        >
+                                            Ingresar al inventario
+                                        </button>
+                                    }
+                                </div></ng-template
+                            >
+                        </div>
+                    }
+                </div>
+            }
+        }
+    }
+</section>

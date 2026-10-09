@@ -1,0 +1,71 @@
+<section class="p-4 md:px-8">
+    <p class="feature-description">
+        Modelos, colores y capacidades para tu inventario.
+    </p>
+
+    <div class="flex flex-row justify-between content-center">
+        <h1>Modelos</h1>
+        <div class="flex flex-row gap-4 items-center">
+            <button class="raised primary" (click)="newDeviceModel()">
+                Nuevo
+            </button>
+            <button
+                [cdkMenuTriggerFor]="menu"
+                class="flex items-center relative"
+            >
+                <icon name="more-vertical"></icon>
+            </button>
+            <ng-template #menu>
+                <div class="menu" cdkMenu>
+                    <button
+                        class="menu-item"
+                        cdkMenuItem
+                        (click)="openColorSettings()"
+                    >
+                        <span>Colores</span>
+                    </button>
+                    <button
+                        class="menu-item"
+                        cdkMenuItem
+                        (click)="openStorageSizeSettings()"
+                    >
+                        <span>Almacenamiento</span>
+                    </button>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+
+    @if (loading()) {
+        <p role="status">Cargando modelos…</p>
+    } @else if (failed()) {
+        <div role="alert">
+            <p>No se pudieron cargar los modelos.</p>
+            <button class="raised primary" (click)="reloadData()">
+                Reintentar
+            </button>
+        </div>
+    } @else if (!models.length) {
+        <p>No hay modelos disponibles</p>
+    }
+    <div
+        [cdkDropListDisabled]="loading() || savingOrder()"
+        class="draggable-list flex flex-col gap-4 mt-4"
+        cdkDropList
+        (cdkDropListDropped)="drop($event)"
+    >
+        @for (model of models; track model.id) {
+            <div
+                class="draggable-box card overflow-auto w-full flex flex-row items-center"
+                cdkDrag
+            >
+                <div class="flex-1 cursor-pointer" (click)="editModel(model)">
+                    <h3>{{ catalogLabel(model.name) }}</h3>
+                    <p>Colores: {{ parseColors(model) }}</p>
+                    <p>Almacenamiento: {{ parseSizes(model) }}</p>
+                </div>
+                <icon name="drag-drop" class="cursor-grab" cdkDragHandle></icon>
+            </div>
+        }
+    </div>
+</section>

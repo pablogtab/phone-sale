@@ -1,0 +1,124 @@
+<form [formGroup]="form" class="flex flex-col justify-between gap-5">
+    <div>
+        <span class="text-lg font-medium">Modelo</span>
+        <device-model-search formControlName="model"></device-model-search>
+    </div>
+    @if (form.controls.model.value) {
+        <div @collapsableOpen style="transform-origin: top">
+            <span class="text-lg font-medium">Color</span>
+            <div class="flex justify-center gap-2 flex-row flex-wrap">
+                @for (color of availableColors; track $index) {
+                    <div
+                        class="px-4 py-2 rounded-full border border-primary flex flex-row items-center gap-1 bg-opacity-25 cursor-pointer"
+                        [class.bg-primary-hover]="
+                            form.controls.colorId.value === color.id
+                        "
+                        (click)="toggleColor(color.id)"
+                    >
+                        <div
+                            class="rounded-full size-4"
+                            [style.background-color]="color.hex"
+                        ></div>
+                        <span>{{ color.name }}</span>
+                    </div>
+                }
+            </div>
+        </div>
+        <div @collapsableOpen style="transform-origin: top">
+            <span class="text-lg font-medium">Capacidad</span>
+            <div class="flex justify-center gap-2 flex-row flex-wrap">
+                @for (size of availableStorageSizes; track $index) {
+                    <div
+                        class="px-4 py-2 rounded-full border border-primary flex flex-row items-center gap-1 bg-opacity-25 cursor-pointer"
+                        [class.bg-primary-hover]="
+                            form.controls.storageSizeId.value === size.id
+                        "
+                        (click)="toggleStorageSize(size.id)"
+                    >
+                        <span>{{ size.size }}</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    <div @collapsableOpen style="transform-origin: top">
+        <span class="text-lg font-medium">Condición de Batería</span>
+        <input type="number" formControlName="batteryHealth" />
+        @if (form.controls.batteryHealth.errors?.["min"]) {
+            <form-error-message>El valor mínimo es 0.</form-error-message>
+        }
+        @if (form.controls.batteryHealth.errors?.["max"]) {
+            <form-error-message>El valor máximo es 100.</form-error-message>
+        }
+    </div>
+    <div @collapsableOpen style="transform-origin: top">
+        <span class="text-lg font-medium">Ciclos de Batería</span>
+        <input type="number" formControlName="batteryCicleCount" />
+        @if (form.controls.batteryCicleCount.errors?.["min"]) {
+            <form-error-message>El valor mínimo es 0.</form-error-message>
+        }
+    </div>
+
+    <div class="flex flex-row items-center gap-4 justify-between">
+        <span class="text-lg font-medium">Tiene problema/s?</span>
+        <toggle formControlName="hasProblem"></toggle>
+    </div>
+
+    <div class="flex flex-row items-center justify-between">
+        <span class="text-lg font-medium">Garantía Oficial Vigente</span>
+        <toggle formControlName="oficialWarranty"></toggle>
+    </div>
+
+    @if (form.controls.oficialWarranty.value) {
+        <div @collapsableOpen style="transform-origin: top">
+            <span class="text-lg font-medium">Vencimiento</span>
+            <input
+                type="string"
+                placeholder="mm/aa"
+                formControlName="warrantyExpiresAt"
+            />
+            @if (form.controls.warrantyExpiresAt.errors?.["pattern"]) {
+                <form-error-message
+                    >El formato debe ser mm/aa.</form-error-message
+                >
+            }
+        </div>
+    }
+
+    <div>
+        <span class="text-lg font-medium">IMEI</span>
+        <input type="text" formControlName="imei" />
+        @if (form.controls.imei.errors?.["pattern"]) {
+            <form-error-message
+                >El IMEI debe tener 15 dígitos.</form-error-message
+            >
+        }
+    </div>
+
+    @if (form.controls.imei.value) {
+        <div @collapsableOpen style="transform-origin: top">
+            <span class="text-lg font-medium">IMEI 2</span>
+            <input type="text" formControlName="imei2" />
+            @if (form.controls.imei2.errors?.["pattern"]) {
+                <form-error-message
+                    >El IMEI debe tener 15 dígitos.</form-error-message
+                >
+            }
+        </div>
+    }
+
+    <div>
+        <span class="text-lg font-medium">Notas</span>
+        <div class="flex flex-col gap-2">
+            <textarea
+                placeholder="Detalles, fallas, aclaraciones, etc..."
+                formControlName="internalComments"
+            ></textarea>
+        </div>
+    </div>
+
+    <div class="flex flex-row items-center gap-4 justify-between">
+        <span class="text-lg font-medium">Ha sido testeado?</span>
+        <toggle formControlName="hasBeenTested"></toggle>
+    </div>
+</form>

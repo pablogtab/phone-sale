@@ -1,0 +1,53 @@
+<dialog-header title="Nuevo pago"></dialog-header>
+<form [formGroup]="form" class="flex flex-col p-4 gap-4 min-h-96">
+    <div>
+        <span>Tipo de pago</span>
+        <p-select [options]="paymentTypes" formControlName="type" />
+    </div>
+    @switch (form.controls.type.value) {
+        @case ("bank") {
+            <bank-search formControlName="bank"></bank-search>
+        }
+        @case ("cash") {
+            <cash-accounts-search
+                formControlName="cashAccount"
+            ></cash-accounts-search>
+        }
+    }
+    <div class="flex flex-row gap-4">
+        <div class="flex-[3] md:flex-[2] flex flex-col">
+            <span>Monto</span>
+            <p-inputnumber
+                (onFocus)="onFocus($event)"
+                fluid
+                mode="decimal"
+                locale="en-US"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                formControlName="amount"
+                prefix="$ "
+            />
+        </div>
+        <div class="flex-[2] md:flex-1 flex flex-col">
+            <span>Moneda</span>
+            <!-- <selectable [config]="selectableCurrencyConfig" [value]="form.controls.currency">
+                @for(option of currencies; track $index) {
+                <selectable-option [value]="option"></selectable-option>
+                }
+            </selectable> -->
+            <p-selectbutton
+                allowEmpty="false"
+                [options]="currencies"
+                [formControl]="form.controls.currency"
+                optionLabel="label"
+                optionValue="currency"
+            />
+        </div>
+    </div>
+    <p-button
+        [disabled]="!buttonEnabled"
+        class="self-end mt-8"
+        (onClick)="save()"
+        >Aceptar</p-button
+    >
+</form>

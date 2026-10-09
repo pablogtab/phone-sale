@@ -1,0 +1,52 @@
+<div class="p-4">
+    <go-back
+        previousRoute="clients"
+        previousRouteName="Clientes"
+        title="{{ client?.name }}"
+    ></go-back>
+
+    <form [formGroup]="clientForm" class="flex flex-col gap-4 mt-5">
+        <div>
+            <label for="name">Nombre *</label>
+            <input formControlName="name" type="text" />
+        </div>
+        <div>
+            <label for="whatsapp">Whatsapp</label>
+            <input formControlName="whatsapp" type="number" />
+        </div>
+        <div>
+            <label for="instagram">Instagram</label>
+            <input
+                formControlName="instagram"
+                type="text"
+                [value]="clientForm.get('instagram')?.value | lowercase"
+            />
+        </div>
+        <div>
+            <label for="identifier">DNI</label>
+            <input formControlName="identifier" type="number" />
+        </div>
+        <div>
+            <label for="identifier">Fecha de Nacimiento</label>
+            <input formControlName="birthDate" type="date" />
+        </div>
+        <div>
+            <label for="address">Dirección</label>
+            <input formControlName="address" type="text" />
+        </div>
+        <div class="flex flex-row justify-between">
+            <label for="address">Mayorista</label>
+            <toggle formControlName="wholesaler"></toggle>
+        </div>
+        <div class="flex flex-row-reverse gap-4">
+            <edit-save-cancel
+                class="flex flex-row-reverse"
+                (cancel)="cancel()"
+                (edit)="edit()"
+                (save)="save()"
+                (del)="deleteClient()"
+                [isEditing]="clientForm.enabled"
+            ></edit-save-cancel>
+        </div>
+    </form>
+</div>

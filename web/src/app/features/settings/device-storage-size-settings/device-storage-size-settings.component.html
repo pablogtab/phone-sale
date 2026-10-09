@@ -1,0 +1,59 @@
+<dialog-header [title]="data.title"></dialog-header>
+<section class="p-4 flex-1">
+    <div class="flex flex-row justify-between items-center">
+        <h3 class="text-text-gray-500">Almacenamientos Disponibles</h3>
+        <button class="raised primary" (click)="openNew()">Nuevo</button>
+    </div>
+
+    <div class="draggable-list" cdkDropList (cdkDropListDropped)="drop($event)">
+        @for (size of sizes; track size.id) {
+            <div
+                class="draggable-box flex flex-row justify-between items-center p-4 mt-4 bg-background-gray-100 rounded-lg"
+                cdkDrag
+            >
+                <div class="flex flex-row items-center gap-4">
+                    <icon
+                        name="drag-drop"
+                        class="text-text-gray-500"
+                        cdkDragHandle
+                    ></icon>
+                    <span> {{ size.size }} </span>
+                </div>
+                <div class="flex flex-row items-center gap-4">
+                    <button class="icon-button" (click)="openEdit(size)">
+                        <i class="icon-edit"></i>
+                    </button>
+                    <toggle
+                        [formControl]="toggleControls[size.id]"
+                        (change)="toggleActive($event, size)"
+                    ></toggle>
+                    <button
+                        [cdkMenuTriggerFor]="menu"
+                        class="flex items-center relative"
+                    >
+                        <icon name="more-vertical"></icon>
+                    </button>
+
+                    <ng-template #menu>
+                        <div class="menu" cdkMenu>
+                            <button
+                                class="menu-item"
+                                cdkMenuItem
+                                (click)="openEdit(size)"
+                            >
+                                <span>Editar</span>
+                            </button>
+                            <button
+                                class="menu-item"
+                                cdkMenuItem
+                                (click)="deleteStorageSize(size)"
+                            >
+                                <span>Eliminar</span>
+                            </button>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        }
+    </div>
+</section>

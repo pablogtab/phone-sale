@@ -1,0 +1,81 @@
+<section class="p-4 md:px-8 flex flex-col gap-3">
+    <p class="feature-description">
+        Accesorios y productos que completan cada venta.
+    </p>
+
+    <div class="flex flex-row justify-between content-center">
+        <h2>Productos</h2>
+        <div class="flex flex-row gap-4 items-center">
+            <p-button
+                label="Nuevo"
+                styleClass="raised primary"
+                (onClick)="newProduct()"
+                *hasPermission="{ permission: 'products', actions: ['write'] }"
+            />
+        </div>
+    </div>
+    <search-term></search-term>
+    <ng-container *ngIf="products$ | async as products; else elseTpl">
+        <div class="flex flex-col rounded-xl overflow-hidden">
+            @for (product of products; track $index; let last = $last) {
+                <div
+                    style="margin-top: 10px"
+                    (click)="editProduct(product)"
+                    class="pt-4 p-4 bottom-1 border-b bg-background-3 border-background-3 flex flex-row justify-between items-center gap-3 hover:bg-background-2 rounded-lg cursor-pointer transition-colors"
+                >
+                    <div class="flex flex-row items-center gap-4">
+                        <div
+                            class="size-12 rounded-lg overflow-hidden bg-background-4"
+                        >
+                            <icon
+                                name="user-focus"
+                                size="90"
+                                class="text-text-gray-100 text-4xl"
+                            ></icon>
+                        </div>
+                    </div>
+                    <div class="flex-1 flex flex-col">
+                        <span class="font-bold">{{ product.description }}</span>
+                    </div>
+                    <button
+                        [cdkMenuTriggerFor]="menu2"
+                        (click)="$event.stopPropagation()"
+                        class="flex items-center relative"
+                    >
+                        <icon name="more-vertical"></icon>
+                    </button>
+
+                    <ng-template #menu2>
+                        <div class="menu" cdkMenu>
+                            <button
+                                class="menu-item"
+                                cdkMenuItem
+                                (click)="editProduct(product)"
+                            >
+                                Editar
+                            </button>
+                            <button
+                                class="menu-item"
+                                cdkMenuItem
+                                (click)="deleteProduct(product)"
+                            >
+                                Eliminar
+                            </button>
+                        </div>
+                    </ng-template>
+                </div>
+            }
+        </div>
+    </ng-container>
+</section>
+<ng-template #elseTpl>
+    @if (loadingProducts) {
+        <ng-container>
+            <div
+                class="d-flex flex-column align-items-center justify-content-center mt-5"
+            >
+                <h4>Cargando usuarios</h4>
+            </div>
+        </ng-container>
+    }
+</ng-template>

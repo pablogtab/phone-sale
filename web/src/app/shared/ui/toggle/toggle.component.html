@@ -1,0 +1,20 @@
+<button
+    type="button"
+    role="switch"
+    [attr.aria-checked]="!!control.value"
+    [attr.aria-label]="label"
+    [disabled]="control.disabled"
+    style="padding: 5px"
+    (click)="toggle()"
+    class="h-8 w-14 bg-background-3 rounded-full flex items-center shadow-md border border-px border-primary"
+    [class.bg-primary]="color === 'primary' && control.value"
+    [style]="{ cursor: control.disabled ? 'not-allowed' : 'pointer' }"
+    [class.!border-background-3]="control.disabled"
+    [class.!bg-background-3]="control.disabled"
+    [class.border-none]="control.value"
+>
+    <div
+        class="h-6 w-6 bg-background-1 rounded-full shadow-md transform transition-transform duration-300"
+        [style.transform]="control.value ? 'translateX(100%)' : 'translateX(0)'"
+    ></div>
+</button>

@@ -1,0 +1,142 @@
+<div class="hidden lg:flex flex-row gap-4 items-center">
+    <table class="w-full" cdk-table [dataSource]="data">
+        @for (column of columns; track $index) {
+            <ng-container cdkColumnDef="{{ column.name }}">
+                <th cdk-header-cell *cdkHeaderCellDef>{{ column.name }}</th>
+                <td cdk-cell *cdkCellDef="let element">
+                    <div class="flex flex-row gap-4 items-center">
+                        @if (column.img) {
+                            @if (column.img.imgGetUrl(element)) {
+                                <img
+                                    [src]="
+                                        baseFileUrl +
+                                        column.img.imgGetUrl(element)
+                                    "
+                                    class="w-12 h-12 object-cover rounded-md"
+                                />
+                            } @else {
+                                <div
+                                    class="w-12 h-12 bg-background-3 rounded-md"
+                                ></div>
+                            }
+                        }
+                        {{ column.get(element) | gridPipe: column.pipe }}
+                    </div>
+                </td>
+                <td cdk-footer-cell *cdkFooterCellDef>
+                    @if (footerMap[column.name]) {
+                        <span class="font-bold">
+                            {{
+                                footerMap[column.name].get(data.array)
+                                    | gridPipe: footerMap[column.name].pipe
+                            }}
+                        </span>
+                    }
+                </td>
+            </ng-container>
+        }
+
+        <ng-container cdkColumnDef="actions">
+            <th cdk-header-cell *cdkHeaderCellDef>Acciones</th>
+            <td cdk-cell *cdkCellDef="let element; let i = index">
+                @for (action of actions; track $index) {
+                    <button
+                        [disabled]="action.disabled(element)"
+                        class="stroked warn"
+                        (click)="executeAction(action.eventName, element, i)"
+                    >
+                        {{ action.label }}
+                    </button>
+                }
+            </td>
+            <td cdk-footer-cell *cdkFooterCellDef></td>
+        </ng-container>
+
+        <tr cdk-header-row *cdkHeaderRowDef="displayedColumns"></tr>
+        <tr cdk-row *cdkRowDef="let row; columns: displayedColumns"></tr>
+        <tr cdk-footer-row *cdkFooterRowDef="displayedColumns"></tr>
+    </table>
+</div>
+
+<div class="lg:hidden flex flex-col gap-4">
+    @for (row of data.array; track $index; let i = $index; let last = $last) {
+        <div class="w-full flex flex-col gap-2">
+            <div
+                class="w-full flex flex-row gap-4 items-center justify-between"
+            >
+                <div class="flex flex-row gap-2 items-center">
+                    @if (headerColumn.img) {
+                        @if (headerColumn.img.imgGetUrl(row)) {
+                            <img
+                                [src]="
+                                    baseFileUrl +
+                                    headerColumn.img.imgGetUrl(row)
+                                "
+                                class="w-12 h-12 object-cover rounded-md"
+                            />
+                        } @else {
+                            <div
+                                class="w-12 h-12 bg-background-3 rounded-md"
+                            ></div>
+                        }
+                    }
+                    <span>{{
+                        headerColumn.get(row) | gridPipe: headerColumn.pipe
+                    }}</span>
+                </div>
+                <button
+                    [cdkMenuTriggerFor]="menu"
+                    class="flex items-center relative"
+                >
+                    <icon name="more-vertical"></icon>
+                </button>
+                <ng-template #menu>
+                    <div class="menu" cdkMenu>
+                        @for (action of actions; track $index) {
+                            <button
+                                class="menu-item"
+                                [disabled]="action.disabled(row)"
+                                cdkMenuItem
+                                (click)="
+                                    executeAction(action.eventName, row, i)
+                                "
+                            >
+                                <span>{{ action.label }}</span>
+                            </button>
+                        }
+                    </div>
+                </ng-template>
+            </div>
+
+            @for (column of nonHeaderColumns; track $index) {
+                <div class="flex flex-row gap-4 items-center justify-between">
+                    <div class="flex flex-row gap-2 items-center">
+                        <span>{{ column.name }}</span>
+                    </div>
+                    <span class="font-bold">
+                        {{ column.get(row) | gridPipe: column.pipe }}
+                    </span>
+                </div>
+            }
+        </div>
+        @if (!last) {
+            <div class="h-[1px] my-3 bg-background-4 w-full"></div>
+        }
+    }
+
+    @if (footers.length > 1 && data.array.length > 0) {
+        <div class="h-[1px] my-2 bg-background-4 w-full"></div>
+        <div class="w-full flex flex-col gap-4">
+            @for (footer of footers; track $index) {
+                <div class="flex flex-row gap-4 items-center justify-between">
+                    <div class="flex flex-row gap-2 items-center">
+                        <span>{{ footer.mobileLabel }}</span>
+                    </div>
+                    <span class="font-bold">
+                        {{ footer.get(data.array) | gridPipe: footer.pipe }}
+                    </span>
+                </div>
+            }
+        </div>
+    }
+</div>

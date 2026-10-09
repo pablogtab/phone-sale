@@ -1,0 +1,86 @@
+<section class="p-4 sales-page">
+    <div class="flex flex-row justify-between items-center">
+        <h1 class="text-2xl font-bold">Ventas</h1>
+        <button class="raised primary" (click)="newOrder()">Nueva orden</button>
+    </div>
+    <p class="feature-description">
+        Cada orden, desde el primer pago hasta la entrega.
+    </p>
+    @if (loading()) {
+        <app-page-state
+            kind="loading"
+            title="Cargando ventas"
+            description="Buscando las órdenes de tu tienda."
+        />
+    } @else if (failed()) {
+        <app-page-state
+            kind="error"
+            title="No pudimos cargar las ventas"
+            (retry)="findOrders()"
+        />
+    } @else if (!orders.length) {
+        <app-page-state
+            title="No hay ventas"
+            description="Creá una orden para registrar productos, pagos y entregas."
+        />
+    }
+    <div
+        [hidden]="loading() || failed() || !orders.length"
+        class="flex flex-col bg-background-2 rounded-xl overflow-hidden mt-4"
+    >
+        @for (order of orders; track $index; let last = $last) {
+            <div
+                class="p-4 bottom-1 border-b border-background-3 flex flex-row justify-between items-center gap-3 hover:bg-background-2 rounded-lg cursor-pointer transition-colors"
+                (click)="orderDetails(order)"
+            >
+                <div class="flex-1 flex flex-col">
+                    <p>
+                        <span>#{{ order.id }} </span>
+                        <span
+                            class="text-sm font-bold"
+                            [class.text-primary-hover]="
+                                order.status === 'confirmed'
+                            "
+                            [class.text-tertiary-hover]="
+                                order.status === 'deposited'
+                            "
+                            [class.text-warn]="order.status === 'cancelled'"
+                            >{{ getOrderStatus(order) | uppercase }}</span
+                        >
+                    </p>
+                    <p class="text-md font-bold">
+                        Cliente: {{ order.clientName }}
+                    </p>
+                </div>
+                <button
+                    [cdkMenuTriggerFor]="menu2"
+                    (click)="$event.stopPropagation()"
+                    class="flex items-center relative"
+                >
+                    <icon name="more-vertical"></icon>
+                </button>
+
+                <ng-template #menu2>
+                    <div class="menu" cdkMenu>
+                        @if (
+                            order.status === "confirmed" ||
+                            order.status === "deposited"
+                        ) {
+                            <button
+                                class="menu-item"
+                                cdkMenuItem
+                                (click)="cancelOrder(order)"
+                            >
+                                Cancelar Orden
+                            </button>
+                        }
+                    </div>
+                </ng-template>
+            </div>
+            @if (!last) {
+                <div class="border-b border-background-4 mx-1.5"></div>
+            }
+        }
+    </div>
+    <paginator></paginator>
+</section>

@@ -1,0 +1,8 @@
+.rate-page { padding: 16px; } h1 { margin-bottom: 8px; }
+.rate-card { max-width: 800px; display: grid; grid-template-columns: .9fr 1.1fr; background: white; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.current-rate { background: #edf3e8; padding: 32px; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+.current-rate > span { font-size: 10px; letter-spacing: 1.5px; color: #6d8169; font-weight: 600; } strong { font-size: 32px; color: var(--primary); letter-spacing: -1px; overflow-wrap: anywhere; }
+.current-rate p, small { color: #70816c; font-size: 12px; } small { margin-top: 14px; }
+.rate-form { padding: 32px; display: flex; flex-direction: column; gap: 18px; }.rate-input { position: relative; }.rate-input span { position: absolute; top: 11px; left: 13px; color: #7c8976; }.rate-input input { padding-left: 30px; }
+.rate-help { color: var(--muted); font-size: 12px; line-height: 1.7; } button { align-self: flex-start; }.validation-error { color: #a43838; font-size: 12px; }
+@media(max-width: 640px) { .rate-card { grid-template-columns: 1fr; } .current-rate, .rate-form { padding: 24px; } }

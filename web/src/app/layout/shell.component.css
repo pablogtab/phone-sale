@@ -1,0 +1,17 @@
+.app-shell {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+    min-height: 100dvh;
+}
+.workspace {
+    min-width: 0;
+    padding: 32px 24px;
+}
+@media (max-width: 767px) {
+    .app-shell {
+        display: block;
+    }
+    .workspace {
+        padding: 20px 12px;
+    }
+}

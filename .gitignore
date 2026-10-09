@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+coverage/
+.angular/
+.env
+.env.*
+!.env.example
+.local/
+.vscode/
+.DS_Store
+*.log
+compose.override.yaml
+uploads/
+*.tsbuildinfo
+out-tsc/

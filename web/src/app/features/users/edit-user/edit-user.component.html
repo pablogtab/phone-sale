@@ -1,0 +1,89 @@
+<dialog-header [title]="data.title"></dialog-header>
+
+<form [formGroup]="form" class="flex flex-col justify-between p-4 gap-5">
+    <div
+        *ngIf="form.get('profilePicture').value"
+        class="rounded-full bg-background-3 w-52 h-52 flex items-center justify-center mt-4 mx-auto hover:cursor-pointer"
+        (click)="changeProfilePicture()"
+    >
+        <img
+            [src]="baseFileUrl + form.get('profilePicture').value"
+            alt="Foto de perfil"
+            class="rounded-full w-full h-full object-cover"
+        />
+    </div>
+
+    <div class="flex flex-col gap-4">
+        <div>
+            <label for="name" class="text-lg font-medium">Nombre</label>
+            <input type="text" pInputText formControlName="name" />
+        </div>
+
+        <div>
+            <label for="lastname" class="text-lg font-medium">Apellido</label>
+            <input type="text" pInputText formControlName="lastname" />
+        </div>
+        @if (!this.data.userId) {
+            <div>
+                <label for="lastname" class="text-lg font-medium"
+                    >Usuario</label
+                >
+                <input type="text" pInputText formControlName="username" />
+            </div>
+            <div>
+                <label for="lastname" class="text-lg font-medium"
+                    >Contraseña</label
+                >
+                <input type="text" pInputText formControlName="password" />
+            </div>
+        }
+    </div>
+
+    <div class="flex mt-4">
+        <p-checkbox
+            formControlName="roleAdmin"
+            [binary]="true"
+            inputId="nyAdmin"
+        />
+        <label for="nyAdmin" class="ml-2">Admin</label>
+
+        <p-checkbox
+            formControlName="roleUser"
+            [binary]="true"
+            inputId="nyUser"
+            class="ml-2"
+        />
+        <label for="nyUser" class="ml-2">User</label>
+    </div>
+</form>
+
+<div *ngIf="form.get('roleUser').value">
+    <label class="text-center font-bold">Permisos</label>
+    <div class="flex flex-col gap-4 mt-4 p-5">
+        <div *ngFor="let permission of permissionKeys">
+            <div class="flex flex-col gap-2">
+                <h3 class="text-lg font-semibold">
+                    {{ permission | titlecase }}
+                </h3>
+                <div
+                    *ngFor="let action of permissionActions"
+                    class="flex gap-3 items-center pl-5"
+                >
+                    <p-checkbox
+                        [binary]="true"
+                        [ngModel]="isActionChecked(permission, action)"
+                        (change)="addActionRole(permission, action, $event)"
+                        [value]="action"
+                    ></p-checkbox>
+                    <label class="ml-2">{{ action }}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="display: flex; justify-content: center; padding-bottom: 5%">
+    <button class="raised primary" (click)="save()" style="width: 50vh">
+        <span>{{ isEdit ? "Guardar cambios" : "Guardar" }}</span>
+    </button>
+</div>

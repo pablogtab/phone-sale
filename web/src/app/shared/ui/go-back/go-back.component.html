@@ -1,0 +1,16 @@
+<div class="flex flex-row items-center gap-4">
+    <span
+        class="text-2xl font-medium hidden sm:block hover:underline underline-offset-4 cursor-pointer"
+        style="text-decoration-thickness: 1px"
+        (click)="goBack()"
+        >{{ previousRouteName }}</span
+    >
+    <icon
+        class="hidden sm:block"
+        name="chevron-right"
+        size="20"
+        (click)="goBack()"
+    />
+    <icon class="sm:hidden" name="chevron-left" size="30" (click)="goBack()" />
+    <span class="text-2xl font-semibold">{{ title }}</span>
+</div>

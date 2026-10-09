@@ -1,0 +1,291 @@
+<dialog-header [title]="data.title"></dialog-header>
+<form [formGroup]="form" class="flex flex-col justify-between p-4 gap-5">
+    <div>
+        <span class="text-lg font-medium">Modelo</span>
+        <device-model-search formControlName="model"></device-model-search>
+    </div>
+    @if (form.controls.model.value) {
+        <div @collapsableOpen style="transform-origin: top">
+            <span class="text-lg font-medium">Color</span>
+            <div class="flex justify-center gap-2 flex-row flex-wrap">
+                @for (color of availableColors; track $index) {
+                    <div
+                        class="px-4 py-2 rounded-full border border-primary flex flex-row items-center gap-1 bg-opacity-25 cursor-pointer"
+                        [class.bg-primary-hover]="
+                            form.controls.colorId.value === color.id
+                        "
+                        (click)="toggleColor(color.id)"
+                    >
+                        <div
+                            class="rounded-full size-4"
+                            [style.background-color]="color.hex"
+                        ></div>
+                        <span>{{ color.name }}</span>
+                    </div>
+                }
+            </div>
+        </div>
+        <div @collapsableOpen style="transform-origin: top">
+            <span class="text-lg font-medium">Capacidad</span>
+            <div class="flex justify-center gap-2 flex-row flex-wrap">
+                @for (size of availableStorageSizes; track $index) {
+                    <div
+                        class="px-4 py-2 rounded-full border border-primary flex flex-row items-center gap-1 bg-opacity-25 cursor-pointer"
+                        [class.bg-primary-hover]="
+                            form.controls.storageSizeId.value === size.id
+                        "
+                        (click)="toggleStorageSize(size.id)"
+                    >
+                        <span>{{ size.size }}</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="flex flex-row items-center gap-4 justify-between">
+        <span class="text-lg font-medium">Equipo Sellado</span>
+        <toggle formControlName="sealed"></toggle>
+    </div>
+
+    @if (!form.controls.sealed.value) {
+        <div @collapsableOpen style="transform-origin: top">
+            <span class="text-lg font-medium">Condición de Batería</span>
+            <input type="number" formControlName="batteryHealth" />
+            @if (form.controls.batteryHealth.errors?.["min"]) {
+                <form-error-message>El valor mínimo es 0.</form-error-message>
+            }
+            @if (form.controls.batteryHealth.errors?.["max"]) {
+                <form-error-message>El valor máximo es 100.</form-error-message>
+            }
+        </div>
+        <div @collapsableOpen style="transform-origin: top">
+            <span class="text-lg font-medium">Ciclos de Batería</span>
+            <input type="number" formControlName="batteryCicleCount" />
+            @if (form.controls.batteryCicleCount.errors?.["min"]) {
+                <form-error-message>El valor mínimo es 0.</form-error-message>
+            }
+        </div>
+    }
+
+    <div class="flex flex-row items-center gap-4 justify-between">
+        <span class="text-lg font-medium">Tiene problema/s?</span>
+        <toggle formControlName="hasProblem"></toggle>
+    </div>
+
+    <div class="flex flex-row items-center justify-between">
+        <span class="text-lg font-medium">Garantía Oficial Vigente</span>
+        <toggle formControlName="oficialWarranty"></toggle>
+    </div>
+
+    @if (form.controls.oficialWarranty.value) {
+        <div @collapsableOpen style="transform-origin: top">
+            <span class="text-lg font-medium">Vencimiento</span>
+            <input
+                type="string"
+                placeholder="mm/aa"
+                formControlName="warrantyExpiresAt"
+            />
+            @if (form.controls.warrantyExpiresAt.errors?.["pattern"]) {
+                <form-error-message
+                    >El formato debe ser mm/aa.</form-error-message
+                >
+            }
+        </div>
+    }
+
+    <div>
+        <span class="text-lg font-medium">IMEI</span>
+        <input type="text" formControlName="imei" />
+        @if (form.controls.imei.errors?.["pattern"]) {
+            <form-error-message
+                >El IMEI debe tener 15 dígitos.</form-error-message
+            >
+        }
+    </div>
+
+    @if (form.controls.imei.value) {
+        <div @collapsableOpen style="transform-origin: top">
+            <span class="text-lg font-medium">IMEI 2</span>
+            <input type="text" formControlName="imei2" />
+            @if (form.controls.imei2.errors?.["pattern"]) {
+                <form-error-message
+                    >El IMEI debe tener 15 dígitos.</form-error-message
+                >
+            }
+        </div>
+    }
+    <!-- Compra -->
+
+    <div>
+        <span class="text-lg font-medium">Proveedor</span>
+        <provider-search formControlName="originProvider"></provider-search>
+    </div>
+
+    <div style="display: flex; gap: 10px">
+        <div>
+            <span class="text-lg font-medium">Precio de compra</span>
+            <input type="number" formControlName="purchasePrice" />
+        </div>
+        <div>
+            <span class="text-lg font-medium">Depreciación</span>
+            <input type="number" formControlName="depreciation" />
+        </div>
+    </div>
+
+    <div>
+        <span class="text-lg font-medium">Foto principal</span>
+        @if (mainPhotoUrl) {
+            <div class="flex flex-row items-center justify-center gap-4">
+                <div class="size-28 rounded-lg overflow-hidden">
+                    <img
+                        [src]="baseFileUrl + mainPhotoUrl"
+                        class="size-28 object-cover"
+                    />
+                </div>
+                <button
+                    class="stroked warn flex flex-row gap-1"
+                    (click)="deleteMainPhoto()"
+                >
+                    <icon color="warn" name="trash"></icon>
+                    <span class="text-warn font-medium">Quitar</span>
+                </button>
+            </div>
+        } @else {
+            <div class="flex flex-row items-center gap-4">
+                <input
+                    type="file"
+                    accept="image/png,image/jpg,image/jpeg"
+                    (change)="uploadMainPhoto($event)"
+                />
+            </div>
+        }
+    </div>
+
+    @if (aditionalFiles.length) {
+        <div class="flex flex-col w-full gap-4">
+            <div class="flex flex-row justify-between items-center">
+                <span class="text-lg font-medium"
+                    >Archivos adicionales ya cargados</span
+                >
+            </div>
+            <div
+                class="flex flex-col w-full gap-4 draggable-list"
+                cdkDropList
+                (cdkDropListDropped)="dropSavedFiles($event)"
+            >
+                @for (file of aditionalFiles; track $index) {
+                    <div
+                        class="draggable-box flex flex-row items-center justify-between gap-4"
+                        cdkDrag
+                    >
+                        <div class="flex flex-row gap-2 items-center">
+                            <icon name="drag-drop" cdkDragHandle></icon>
+                            <span>{{ file.description }}</span>
+                        </div>
+                        <div class="flex flex-row gap-2 items-center">
+                            <div class="size-24 rounded-md overflow-hidden">
+                                @if (file.type === "image") {
+                                    <img
+                                        class="size-24 object-cover"
+                                        [src]="baseFileUrl + file.url"
+                                        alt="file"
+                                    />
+                                } @else if (file.type === "video") {
+                                    <video
+                                        class="size-24 object-cover"
+                                        [src]="baseFileUrl + file.url"
+                                        alt="file"
+                                        controls
+                                    ></video>
+                                } @else if (file.type === "pdf") {
+                                    <icon name="apple"></icon>
+                                }
+                            </div>
+                            <button
+                                (click)="deleteSavedFile($index, file.publicId)"
+                            >
+                                <icon color="warn" name="trash"></icon>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="flex flex-col w-full gap-4">
+        <div class="flex flex-row justify-between items-center">
+            <span class="text-lg font-medium">Archivos adicionales</span>
+            <button class="stroked primary" (click)="newFile()">Agregar</button>
+        </div>
+        <div
+            class="flex flex-col w-full gap-4 draggable-list"
+            cdkDropList
+            (cdkDropListDropped)="drop($event)"
+        >
+            @for (file of aditionalFilesToUpload; track $index) {
+                <div
+                    class="draggable-box flex flex-row items-center justify-between gap-4"
+                    cdkDrag
+                >
+                    <div class="flex flex-row gap-2 items-center">
+                        <icon name="drag-drop" cdkDragHandle></icon>
+                        <span>{{ file.description }}</span>
+                    </div>
+                    <div class="flex flex-row gap-2 items-center">
+                        <div class="size-24 rounded-md overflow-hidden">
+                            @if (file.type === "image") {
+                                <img
+                                    class="size-24 object-cover"
+                                    src="{{ file.uri }}"
+                                    alt="file"
+                                />
+                            } @else if (file.type === "video") {
+                                <video
+                                    class="size-24 object-cover"
+                                    src="{{ file.uri }}"
+                                    alt="file"
+                                    controls
+                                ></video>
+                            } @else if (file.type === "pdf") {
+                                <icon name="apple"></icon>
+                            }
+                        </div>
+                        <button (click)="deleteToUploadFile($index)">
+                            <icon color="warn" name="trash"></icon>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div>
+        <span class="text-lg font-medium">Notas al público</span>
+        <div>
+            <textarea
+                placeholder="Accesorios, garantía, caja, etc..."
+                formControlName="publicComments"
+            ></textarea>
+        </div>
+    </div>
+
+    <div>
+        <span class="text-lg font-medium">Historial (interno)</span>
+        <div class="flex flex-col gap-2">
+            <textarea
+                placeholder="Detalles, fallas, aclaraciones, etc..."
+                formControlName="internalComments"
+            ></textarea>
+        </div>
+    </div>
+
+    <button class="raised primary mt-1" (click)="save()">
+        @if (isEdit) {
+            <span>Guardar cambios</span>
+        } @else {
+            <span>Guardar</span>
+        }
+    </button>
+</form>

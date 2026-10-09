@@ -1,0 +1,31 @@
+<dialog-header [title]="data.title"></dialog-header>
+<form [formGroup]="form" class="flex flex-col justify-between p-4 gap-5">
+    <div>
+        <label>Descripción de Producto</label>
+        <input pInputText formControlName="description" autocomplete="off" />
+    </div>
+    <div>
+        <label>Stock</label>
+        <p-inputnumber formControlName="stock" autocomplete="off" />
+    </div>
+    <div>
+        <label>Precio de Compra</label>
+        <p-inputnumber
+            prefix="USD "
+            formControlName="costPrice"
+            autocomplete="off"
+        />
+    </div>
+    <div>
+        <label>Precio de Venta</label>
+        <p-inputnumber
+            prefix="USD "
+            formControlName="sellingPrice"
+            autocomplete="off"
+        />
+    </div>
+
+    <p-button class="self-end" severity="primary" (onClick)="save()"
+        >Guardar</p-button
+    >
+</form>
