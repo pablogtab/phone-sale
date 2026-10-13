@@ -1,8 +1,40 @@
 # Phone Sale
 
-A fresh local Git repository combining the FaceID API and web application as regular source files. Source history and remotes were removed; provenance is in [docs/SOURCES.md](docs/SOURCES.md).
+**Inventory, sales, and accounting for phone retailers.**
 
-The rebuild follows Gym's main structure: NestJS 11 with native TypeORM repositories and PostgreSQL 16 in `api/`, and Angular 22 with `core/`, `features/`, `layout/`, and `shared/` in `web/`. The interface uses a new light workspace, forest-green navigation, responsive login, lazy routes, and a single OpenNG Icons vocabulary.
+Phone Sale connects the everyday operations of a phone shop: buying stock, tracking individual devices, selling phones and accessories, collecting payments, and managing cash and bank accounts in ARS and USD.
+
+## Features
+
+- Device and accessory inventory, including used-device grades and repair or transit states.
+- Supplier purchases, sales, quotations, reservations, deposits, and cancellations.
+- Customer records, user authentication, and permissions.
+- Cash and bank operations with balances in ARS and USD.
+- An editable iPhone catalog and configurable store settings.
+- An isolated demo seed with fictional customers and transactions.
+
+## Technology
+
+| Layer | Tools |
+| --- | --- |
+| Web application | Angular, TypeScript |
+| API | NestJS, TypeORM |
+| Database | PostgreSQL |
+| Delivery | Docker, Nginx, GitHub Actions |
+| Validation | API and web tests, database integration tests |
+
+## Preview
+
+![Phone Sale sign-in screen](docs/images/sign-in.png)
+
+*Sign-in screen captured from the local application; no account or customer data is shown.*
+
+## Explore the implementation
+
+- [Architecture](docs/ARCHITECTURE.md): application structure and design decisions.
+- [Testing](docs/TESTING.md): scenarios, coverage, and validation boundaries.
+- [Deployment](deploy/README.md): container setup and deployment workflow.
+- [Source provenance](docs/SOURCES.md): origins of the code incorporated into this repository.
 
 ## Run locally
 
